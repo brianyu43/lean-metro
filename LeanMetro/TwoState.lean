@@ -1,4 +1,4 @@
-import LeanMetro.OffDiagonal
+import LeanMetro.Transition
 
 namespace LeanMetro
 
@@ -21,6 +21,37 @@ theorem two_state_row_sum (i : Fin 2) :
 theorem two_state_proposal_symmetric (i j : Fin 2) :
     twoStateProposal i j = twoStateProposal j i := by
   fin_cases i <;> fin_cases j <;> norm_num [twoStateProposal]
+
+theorem two_state_weight_pos (i : Fin 2) :
+    0 < twoStateWeight i := by
+  fin_cases i <;> norm_num [twoStateWeight]
+
+theorem two_state_proposal_nonneg (i j : Fin 2) :
+    0 ≤ twoStateProposal i j := by
+  fin_cases i <;> fin_cases j <;> norm_num [twoStateProposal]
+
+theorem two_state_proposal_row_sum (i : Fin 2) :
+    ∑ j : Fin 2, twoStateProposal i j = 1 := by
+  fin_cases i <;> norm_num [twoStateProposal, Fin.sum_univ_two]
+
+theorem two_state_transition_eq_general (i j : Fin 2) :
+    mhTransition twoStateWeight twoStateProposal i j =
+      twoStateTransition i j := by
+  fin_cases i <;> fin_cases j <;>
+    norm_num [mhTransition, mhLeavingMass, mhAcceptedMove, mhAcceptance,
+      twoStateWeight, twoStateProposal, twoStateTransition]
+
+theorem two_state_transition_nonneg_from_general (i j : Fin 2) :
+    0 ≤ twoStateTransition i j := by
+  rw [← two_state_transition_eq_general]
+  exact mhTransition_nonneg
+    twoStateWeight twoStateProposal
+    two_state_weight_pos two_state_proposal_nonneg two_state_proposal_row_sum i j
+
+theorem two_state_row_sum_from_general (i : Fin 2) :
+    ∑ j : Fin 2, twoStateTransition i j = 1 := by
+  simp_rw [← two_state_transition_eq_general]
+  exact mhTransition_row_sum twoStateWeight twoStateProposal i
 
 theorem two_state_transition_off_diagonal
     {i j : Fin 2} (hij : i ≠ j) :
