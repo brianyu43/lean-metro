@@ -1,4 +1,4 @@
-import LeanMetro.Transition
+import LeanMetro.Stationary
 
 namespace LeanMetro
 
@@ -53,6 +53,12 @@ theorem two_state_row_sum_from_general (i : Fin 2) :
   simp_rw [← two_state_transition_eq_general]
   exact mhTransition_row_sum twoStateWeight twoStateProposal i
 
+theorem two_state_stationary_eq_normalized (i : Fin 2) :
+    normalizedWeight twoStateWeight i = twoStateStationary i := by
+  fin_cases i <;>
+    norm_num [normalizedWeight, totalWeight, twoStateWeight,
+      twoStateStationary, Fin.sum_univ_two]
+
 theorem two_state_transition_off_diagonal
     {i j : Fin 2} (hij : i ≠ j) :
     twoStateTransition i j =
@@ -69,11 +75,29 @@ theorem two_state_detailed_balance (i j : Fin 2) :
   fin_cases i <;> fin_cases j <;>
     norm_num [twoStateWeight, twoStateTransition]
 
+theorem two_state_detailed_balance_from_general (i j : Fin 2) :
+    twoStateWeight i * twoStateTransition i j =
+      twoStateWeight j * twoStateTransition j i := by
+  rw [← two_state_transition_eq_general i j]
+  rw [← two_state_transition_eq_general j i]
+  exact mhTransition_detailed_balance
+    twoStateWeight twoStateProposal
+    two_state_weight_pos two_state_proposal_symmetric i j
+
 theorem two_state_stationary (j : Fin 2) :
     ∑ i : Fin 2, twoStateStationary i * twoStateTransition i j =
       twoStateStationary j := by
   fin_cases j <;>
     norm_num [twoStateStationary, twoStateTransition, Fin.sum_univ_two]
+
+theorem two_state_stationary_from_general (j : Fin 2) :
+    ∑ i : Fin 2, twoStateStationary i * twoStateTransition i j =
+      twoStateStationary j := by
+  simp_rw [← two_state_stationary_eq_normalized]
+  simp_rw [← two_state_transition_eq_general]
+  exact mhTransition_stationary
+    twoStateWeight twoStateProposal
+    two_state_weight_pos two_state_proposal_symmetric j
 
 theorem two_state_off_diagonal_balance_from_general :
     twoStateWeight 0 * twoStateTransition 0 1 =
