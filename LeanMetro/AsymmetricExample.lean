@@ -1,4 +1,4 @@
-import LeanMetro.Asymmetric
+import LeanMetro.AcceptanceRule
 import LeanMetro.TwoState
 
 namespace LeanMetro
@@ -66,5 +66,40 @@ theorem asymmetric_two_state_stationary_from_general (j : Fin 2) :
   exact mhAsymmetricTransition_stationary
     twoStateWeight asymmetricTwoStateProposal
     two_state_weight_pos asymmetric_two_state_proposal_nonneg j
+
+/-- A valid but deliberately inefficient rule that rejects every proposal. -/
+def rejectAllAcceptance : Fin 2 → Fin 2 → ℝ :=
+  fun _ _ => 0
+
+theorem reject_all_acceptance_admissible :
+    AdmissibleAcceptance
+      twoStateWeight asymmetricTwoStateProposal rejectAllAcceptance := by
+  constructor
+  · intro x y
+    simp [rejectAllAcceptance]
+  · intro x y
+    simp [rejectAllAcceptance]
+  · intro x y
+    simp [rejectAllAcceptance]
+
+theorem asymmetric_mh_dominates_reject_all :
+    acceptRejectTransition
+        asymmetricTwoStateProposal rejectAllAcceptance 0 1 ≤
+      mhAsymmetricTransition
+        twoStateWeight asymmetricTwoStateProposal 0 1 := by
+  exact mhTransition_offDiagonal_dominates
+    twoStateWeight asymmetricTwoStateProposal rejectAllAcceptance
+    two_state_weight_pos asymmetric_two_state_proposal_nonneg
+    reject_all_acceptance_admissible (by decide)
+
+theorem asymmetric_mh_strictly_dominates_reject_all :
+    acceptRejectTransition
+        asymmetricTwoStateProposal rejectAllAcceptance 0 1 <
+      mhAsymmetricTransition
+        twoStateWeight asymmetricTwoStateProposal 0 1 := by
+  norm_num [acceptRejectTransition, acceptRejectAcceptedMove,
+    rejectAllAcceptance, mhAsymmetricTransition,
+    mhAsymmetricAcceptedMove, mhAsymmetricAcceptance,
+    twoStateWeight, asymmetricTwoStateProposal]
 
 end LeanMetro

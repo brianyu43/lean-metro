@@ -20,6 +20,16 @@ scalar acceptance identity
 > 같은 proposal과 target을 사용하는 reversible accept/reject 규칙 중
 > MH가 MCMC estimator의 asymptotic variance를 최소화하는가?
 
+현재 진행 상태:
+
+- [x] Phase 0 — GitHub Actions clean build
+- [x] Phase 1 — generic acceptance, accept/reject transition, MH maximality
+- [ ] Phase 2 — finite reversible kernel 계층
+- [ ] Phase 3 — weighted operator와 Dirichlet ordering
+- [ ] Phase 4 — mean-zero 공간과 Poisson equation
+- [ ] Phase 5 — algebraic asymptotic variance와 Peskun theorem
+- [ ] Phase 6 — 확률적 variance-limit 연결
+
 ## 2. 최종 목표
 
 유한 상태공간 `S`, 양의 target weight `w`, stochastic proposal `q`,

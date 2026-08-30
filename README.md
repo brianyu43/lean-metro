@@ -51,6 +51,26 @@ P(x,x) = 1 - ∑ y ≠ x, q(x,y) * acceptance(x,y)
 정규화, transition의 비음수성과 행 합, detailed balance, stationarity를
 한 정리로 묶는다.
 
+## Part II: Peskun ordering 진행 상태
+
+[장기 로드맵](PESKUN_ROADMAP.md)에 따라 “MH가 맞다”에서 “왜 MH가 같은
+proposal의 다른 reversible accept/reject 규칙보다 효율적인가”로 확장하고
+있다.
+
+현재 `LeanMetro/AcceptanceRule.lean`에서 다음을 증명했다.
+
+- `AdmissibleAcceptance`: acceptance의 범위와 accepted-flow balance
+- generic `acceptRejectTransition`의 stochasticity, detailed balance,
+  stationarity
+- `mhAsymmetricAcceptance_admissible`
+- `mhAcceptedMove_maximal`: MH가 accepted move를 최대화
+- `mhTransition_offDiagonal_dominates`: 모든 비대각 transition에서 MH가
+  임의 admissible rule을 지배
+
+비대칭 2상태 예제에서는 모든 proposal을 거절하는 admissible rule보다 MH의
+`0 → 1` transition이 엄격히 큼을 계산했다. 다음 이론 층은 finite reversible
+kernel과 Dirichlet form이다.
+
 ## 수치 예제
 
 ### 대칭 proposal
@@ -97,6 +117,7 @@ LeanMetro/
 ├── Transition.lean
 ├── Stationary.lean
 ├── Asymmetric.lean
+├── AcceptanceRule.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
 ```
