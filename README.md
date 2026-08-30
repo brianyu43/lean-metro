@@ -2,6 +2,8 @@
 
 [![Lean CI](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml/badge.svg)](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml)
 
+[English README](README.en.md)
+
 유한 상태공간 Metropolis–Hastings(MH) 알고리즘의 transition matrix,
 detailed balance, stationary distribution을 Lean 4로 형식 검증한 작은
 프로젝트다.
@@ -27,6 +29,12 @@ detailed balance, stationary distribution을 Lean 4로 형식 검증한 작은
 
   acceptance가 detailed balance를 만족한다.
 - 두 경우 모두 정규화된 target weight가 stationary distribution이다.
+- 같은 target과 proposal의 admissible accept/reject 규칙 중 MH가 모든
+  비대각 transition을 최대화한다.
+- Peskun domination은 Dirichlet form을 증가시키고 inverse quadratic form을
+  감소시킨다.
+- centered Poisson problem이 invertible이면 MH가 algebraic asymptotic
+  variance를 최소화한다.
 
 대각항은 다른 상태로 실제 이동하고 남은 확률로 정의한다.
 
@@ -51,7 +59,7 @@ P(x,x) = 1 - ∑ y ≠ x, q(x,y) * acceptance(x,y)
 정규화, transition의 비음수성과 행 합, detailed balance, stationarity를
 한 정리로 묶는다.
 
-## Part II: Peskun ordering 진행 상태
+## Part II: Peskun ordering
 
 [장기 로드맵](PESKUN_ROADMAP.md)에 따라 “MH가 맞다”에서 “왜 MH가 같은
 proposal의 다른 reversible accept/reject 규칙보다 효율적인가”로 확장하고
@@ -98,7 +106,13 @@ maximality부터 variance ordering까지를 한 정리로 합성한다.
 두 예제 모두 직접 계산과 일반 Peskun 정리 적용을 함께 검증한다.
 
 현재 `asymptotic variance`는 Poisson 식으로 정의한 algebraic quantity다.
-stationary chain의 실제 분산 극한과의 동일성은 별도 stretch 단계이며,
+`LeanMetro/VarianceLimit.lean`은 stationary covariance 형태의 유한시간 식이
+Poisson remainder의 Cesàro 평균만큼 algebraic variance와 다르다는 정확한
+항등식과, remainder covariance가 0으로 수렴할 때의 극한 정리를 증명한다.
+3상태 fast-kernel 예제에서는 이 극한이 `2/3`임을 검증한다.
+
+확률공간 위의 random-variable sample mean과 covariance 식의 동일성은 별도
+후속 stretch 단계이며,
 [정리 가정 감사](THEOREM_AUDIT.md)에 claim boundary를 기록했다.
 
 ## 수치 예제
@@ -149,8 +163,29 @@ LeanMetro/
 ├── Asymmetric.lean
 ├── AcceptanceRule.lean
 ├── MarkovKernel.lean
+├── WeightedSpace.lean
+├── DirichletForm.lean
+├── MeanZero.lean
+├── Poisson.lean
+├── PoissonExample.lean
+├── AsymptoticVariance.lean
+├── Peskun.lean
+├── PeskunExample.lean
+├── ThreeStateExample.lean
+├── VarianceLimit.lean
+├── VarianceLimitExample.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
+```
+
+핵심 의존성은 다음 순서다.
+
+```text
+AcceptanceRule → MarkovKernel → WeightedSpace → DirichletForm
+                                             ↓
+MeanZero → Poisson → AsymptoticVariance → Peskun
+                                         ↓
+                                  VarianceLimit
 ```
 
 ## 빌드
@@ -169,18 +204,23 @@ lake build
 lake env lean LeanMetro/Stationary.lean
 lake env lean LeanMetro/Asymmetric.lean
 lake env lean LeanMetro/AsymmetricExample.lean
+lake env lean LeanMetro/Peskun.lean
+lake env lean LeanMetro/VarianceLimit.lean
 ```
 
 ## 의도적인 범위 제한
 
-이 프로젝트가 증명하는 것은 유한 상태 MH transition의 한 단계 correctness다.
-다음은 포함하지 않는다.
+이 프로젝트는 finite-state MH correctness와 명시적 Poisson-invertibility
+가정 아래의 algebraic Peskun theorem을 증명한다. 다음은 포함하지 않는다.
 
-- irreducibility와 aperiodicity
+- 일반 irreducibility·aperiodicity 이론과 그로부터 Poisson invertibility를
+  자동 도출하는 adapter
 - 임의 초기분포에서 stationary distribution으로의 convergence
 - convergence rate 또는 mixing time
 - 일반 측도공간의 `ProbabilityTheory.Kernel`
 - 부동소수점 sampler 구현의 정확성
+- 확률공간 위 random-variable sample mean과 `stationaryScaledVariance`의
+  동일성
 
 detailed balance와 stationarity만으로 임의 초기상태에서의 convergence가
 따라오는 것은 아니다.

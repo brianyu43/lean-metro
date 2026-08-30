@@ -28,7 +28,8 @@ scalar acceptance identity
 - [x] Phase 3 — weighted operator와 Dirichlet ordering
 - [x] Phase 4 — mean-zero 공간과 Poisson equation
 - [x] Phase 5 — algebraic asymptotic variance와 Peskun theorem
-- [ ] Phase 6 — 확률적 variance-limit 연결
+- [x] Phase 6a — covariance/Cesàro variance-limit bridge
+- [ ] Phase 6b — 확률공간 위의 Markov process variance identity (후속 stretch)
 
 ## 2. 최종 목표
 
@@ -37,11 +38,13 @@ admissible acceptance `a`, 평균 0 함수 `f`에 대해 다음 최종 정리를
 한다.
 
 ```lean
-theorem metropolisHastings_minimizes_asymptoticVariance
+theorem metropolisHastings_minimizes_algebraicAsymptoticVariance
     (ha : AdmissibleAcceptance w q a)
+    (hinvMH : MeanZeroPoissonInvertible π mhKernel)
+    (hinvA : MeanZeroPoissonInvertible π acceptRejectKernel)
     (hf : MeanZero π f) :
-    asymptoticVariance (mhKernel w q) π f ≤
-      asymptoticVariance (acceptRejectKernel q a) π f := by
+    algebraicAsymptoticVariance π mhKernel hinvMH f hf ≤
+      algebraicAsymptoticVariance π acceptRejectKernel hinvA f hf := by
   ...
 ```
 
@@ -215,21 +218,37 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 - 2상태와 3상태 수치 예제
 - 가정 누락 여부에 대한 별도 theorem audit
 
-### Phase 6 — 확률적 variance-limit 연결 (stretch)
+### Phase 6 — Variance-limit 연결
 
-산출물 후보:
+완료한 6a:
 
-- stationary finite chain의 covariance identity
-- finite-time partial-sum variance 공식
-- spectral decomposition 또는 finite geometric-series resolvent
-- `lim n * Var(mean)`과 algebraic variance의 동치
+- [x] `markovIterate`와 lag covariance
+- [x] stationary covariance 형태의 finite-time scaled variance
+- [x] Poisson 식과의 정확한 finite-time remainder identity
+- [x] Cesàro 정리를 사용한 조건부 variance-limit theorem
+- [x] 3상태 fast kernel에서 극한값 `2/3` 검증
+
+후속 6b:
+
+- [ ] 확률공간 위의 stationary Markov process 구성
+- [ ] 실제 random-variable partial sum의 variance를 covariance 공식과 연결
+- [ ] irreducibility/aperiodicity 또는 spectral 가정에서 decay 자동 도출
+
+구현한 산출물:
+
+- `LeanMetro/VarianceLimit.lean`
+- `stationaryScaledVariance_eq_algebraic_sub_remainder`
+- `stationaryScaledVariance_tendsto_algebraicAsymptoticVariance`
+- `LeanMetro/VarianceLimitExample.lean`
+- `three_state_fast_scaledVariance_limit`
 
 진행 조건:
 
-- Phase 5가 안정적으로 완료된 뒤 착수한다.
-- mathlib에서 필요한 finite-dimensional spectral API를 먼저 조사한다.
-- 직접 극한 연결이 포트폴리오 일정을 위협하면 독립 후속 milestone로 남기고
-  algebraic 결과를 probabilistic limit로 표현하지 않는다.
+- 6a의 극한 정리는 Poisson remainder covariance가 0으로 수렴한다는 가정을
+  정리문에 노출한다.
+- 6b가 완료되기 전에는 `stationaryScaledVariance`를 실제 확률변수의
+  `n * Var(mean)`과 같다고 Lean이 증명했다고 주장하지 않는다.
+- 일반 확률과정·spectral adapter는 독립 후속 milestone로 유지한다.
 
 ## 5. 예상 파일 구조
 
@@ -251,6 +270,8 @@ LeanMetro/
 ├── Peskun.lean
 ├── PeskunExample.lean
 ├── ThreeStateExample.lean
+├── VarianceLimit.lean
+├── VarianceLimitExample.lean
 └── examples/
 ```
 

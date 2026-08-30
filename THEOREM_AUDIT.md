@@ -36,11 +36,20 @@ admissible acceptance
   ⇒ algebraic asymptotic-variance ordering
 ```
 
+## 조건부 variance-limit bridge
+
+`stationaryScaledVariance_tendsto_algebraicAsymptoticVariance`는 Poisson
+remainder covariance가 0으로 수렴한다는 명시적 가정 아래, stationary
+covariance 형태의 유한시간 식이 algebraic asymptotic variance로 수렴함을
+증명한다. 3상태 fast-kernel 예제에서는 이 decay와 극한값 `2/3`을 Lean이
+검사한다.
+
 ## 아직 주장하지 않는 것
 
 - irreducibility에서 `MeanZeroPoissonInvertible`을 자동 도출
 - 실제 확률변수로 만든 stationary Markov chain의 CLT
-- `lim n * Var(sample mean)`과 algebraic variance의 동일성
+- 실제 stationary random-variable process의 `lim n * Var(sample mean)`과
+  `stationaryScaledVariance`의 동일성
 - convergence rate 또는 mixing-time 최적성
 - 부동소수점 구현의 수치적 정확성
 

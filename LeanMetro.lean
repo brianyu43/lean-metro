@@ -14,5 +14,7 @@ import LeanMetro.AsymptoticVariance
 import LeanMetro.Peskun
 import LeanMetro.PeskunExample
 import LeanMetro.ThreeStateExample
+import LeanMetro.VarianceLimit
+import LeanMetro.VarianceLimitExample
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample
