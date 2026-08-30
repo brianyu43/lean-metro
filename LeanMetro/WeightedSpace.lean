@@ -34,6 +34,39 @@ theorem weightedInner_add_left
   intro x _
   ring
 
+theorem weightedInner_add_right
+    {ι : Type*} [Fintype ι]
+    (π f g h : ι → ℝ) :
+    weightedInner π f (fun x => g x + h x) =
+      weightedInner π f g + weightedInner π f h := by
+  unfold weightedInner
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro x _
+  ring
+
+theorem weightedInner_sub_left
+    {ι : Type*} [Fintype ι]
+    (π f g h : ι → ℝ) :
+    weightedInner π (fun x => f x - g x) h =
+      weightedInner π f h - weightedInner π g h := by
+  unfold weightedInner
+  rw [← Finset.sum_sub_distrib]
+  apply Finset.sum_congr rfl
+  intro x _
+  ring
+
+theorem weightedInner_sub_right
+    {ι : Type*} [Fintype ι]
+    (π f g h : ι → ℝ) :
+    weightedInner π f (fun x => g x - h x) =
+      weightedInner π f g - weightedInner π f h := by
+  unfold weightedInner
+  rw [← Finset.sum_sub_distrib]
+  apply Finset.sum_congr rfl
+  intro x _
+  ring
+
 theorem weightedInner_smul_left
     {ι : Type*} [Fintype ι]
     (π f g : ι → ℝ) (c : ℝ) :
@@ -52,6 +85,17 @@ theorem markovOperator_add
       markovOperator P f x + markovOperator P g x := by
   unfold markovOperator
   rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro y _
+  ring
+
+theorem markovOperator_sub
+    {ι : Type*} [Fintype ι]
+    (P : FiniteKernel ι) (f g : ι → ℝ) (x : ι) :
+    markovOperator P (fun y => f y - g y) x =
+      markovOperator P f x - markovOperator P g x := by
+  unfold markovOperator
+  rw [← Finset.sum_sub_distrib]
   apply Finset.sum_congr rfl
   intro y _
   ring

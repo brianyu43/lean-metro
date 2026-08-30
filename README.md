@@ -80,9 +80,14 @@ Dirichlet identity와 Peskun ordering을 증명하며, 이를 앞 단계의 acce
 maximality에 연결해 MH가 모든 admissible accept/reject 규칙보다 Dirichlet
 form을 크게 만든다는 정리를 제공한다.
 
-다음 이론 층은 mean-zero 함수 공간, Poisson equation, inverse quadratic
-form이다. 이 층을 통해 Dirichlet ordering을 algebraic asymptotic variance
-ordering으로 옮긴다.
+`LeanMetro/MeanZero.lean`과 `LeanMetro/Poisson.lean`은 mean-zero 함수에
+대한 `I-P`의 injectivity와 Poisson 해의 존재·유일성 인터페이스를 만든다.
+`LeanMetro/PoissonExample.lean`에서는 2상태 MH의 centered Poisson 해를
+직접 구성한다. 반대로 identity chain은 모든 함수가 고정점이므로 필요한
+고정점 조건을 만족하지 않는다는 singular 회귀 예제도 포함한다.
+
+다음 이론 층은 inverse quadratic form과 algebraic asymptotic variance다.
+이 층에서 Dirichlet ordering을 최종 variance ordering으로 옮긴다.
 
 ## 수치 예제
 

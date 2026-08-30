@@ -7,5 +7,8 @@ import LeanMetro.AcceptanceRule
 import LeanMetro.MarkovKernel
 import LeanMetro.WeightedSpace
 import LeanMetro.DirichletForm
+import LeanMetro.MeanZero
+import LeanMetro.Poisson
+import LeanMetro.PoissonExample
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample

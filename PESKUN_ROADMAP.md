@@ -26,7 +26,7 @@ scalar acceptance identity
 - [x] Phase 1 — generic acceptance, accept/reject transition, MH maximality
 - [x] Phase 2 — finite reversible kernel 계층
 - [x] Phase 3 — weighted operator와 Dirichlet ordering
-- [ ] Phase 4 — mean-zero 공간과 Poisson equation
+- [x] Phase 4 — mean-zero 공간과 Poisson equation
 - [ ] Phase 5 — algebraic asymptotic variance와 Peskun theorem
 - [ ] Phase 6 — 확률적 variance-limit 연결
 
@@ -156,6 +156,14 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 
 ### Phase 4 — Mean-zero 공간과 Poisson equation
 
+진행 상태:
+
+- [x] weighted mean과 `MeanZero`
+- [x] `laplacianOperator P = I - P`
+- [x] `FixedPointsAreConstants`에서 mean-zero injectivity
+- [x] Poisson 해의 존재·유일성 인터페이스
+- [x] 정상 2상태 예제와 singular identity-kernel 반례
+
 산출물:
 
 - `LeanMetro/MeanZero.lean`
@@ -229,6 +237,7 @@ LeanMetro/
 ├── DirichletForm.lean
 ├── MeanZero.lean
 ├── Poisson.lean
+├── PoissonExample.lean
 ├── AsymptoticVariance.lean
 ├── Peskun.lean
 └── examples/
