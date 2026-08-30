@@ -10,6 +10,8 @@ import LeanMetro.DirichletForm
 import LeanMetro.MeanZero
 import LeanMetro.Poisson
 import LeanMetro.PoissonExample
+import LeanMetro.Irreducibility
+import LeanMetro.IrreducibilityExample
 import LeanMetro.AsymptoticVariance
 import LeanMetro.Peskun
 import LeanMetro.PeskunExample
@@ -21,5 +23,6 @@ import LeanMetro.StationaryMoments
 import LeanMetro.SampleMeanVariance
 import LeanMetro.ProbabilisticPeskun
 import LeanMetro.SampleMeanVarianceExample
+import LeanMetro.CrownExample
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample
