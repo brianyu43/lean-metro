@@ -25,7 +25,7 @@ scalar acceptance identity
 - [x] Phase 0 — GitHub Actions clean build
 - [x] Phase 1 — generic acceptance, accept/reject transition, MH maximality
 - [x] Phase 2 — finite reversible kernel 계층
-- [ ] Phase 3 — weighted operator와 Dirichlet ordering
+- [x] Phase 3 — weighted operator와 Dirichlet ordering
 - [ ] Phase 4 — mean-zero 공간과 Poisson equation
 - [ ] Phase 5 — algebraic asymptotic variance와 Peskun theorem
 - [ ] Phase 6 — 확률적 variance-limit 연결
@@ -129,8 +129,8 @@ A a(x,y) = B a(y,x) ≤ B
 - [x] `weightedInner`와 `markovOperator` 정의
 - [x] Markov operator의 선형성 및 상수 함수 보존
 - [x] reversibility에서 weighted self-adjointness
-- [ ] Dirichlet identity
-- [ ] Peskun domination에서 Dirichlet ordering
+- [x] Dirichlet identity
+- [x] Peskun domination에서 Dirichlet ordering
 
 산출물:
 

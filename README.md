@@ -75,9 +75,14 @@ transition이 엄격히 큼을 계산하고 이 kernel ordering을 인스턴스�
 
 `LeanMetro/WeightedSpace.lean`은 `π`-가중 내적과 Markov operator를
 정의하고, detailed balance를 이용해 reversible kernel의 Markov operator가
-weighted self-adjoint임을 증명한다. 다음 정리는 이 연산자에서 Dirichlet
-form을 만들고 Peskun domination이 Dirichlet form의 대소관계를 준다는
-것이다.
+weighted self-adjoint임을 증명한다. `LeanMetro/DirichletForm.lean`은
+Dirichlet identity와 Peskun ordering을 증명하며, 이를 앞 단계의 acceptance
+maximality에 연결해 MH가 모든 admissible accept/reject 규칙보다 Dirichlet
+form을 크게 만든다는 정리를 제공한다.
+
+다음 이론 층은 mean-zero 함수 공간, Poisson equation, inverse quadratic
+form이다. 이 층을 통해 Dirichlet ordering을 algebraic asymptotic variance
+ordering으로 옮긴다.
 
 ## 수치 예제
 

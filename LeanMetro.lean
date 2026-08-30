@@ -6,5 +6,6 @@ import LeanMetro.Asymmetric
 import LeanMetro.AcceptanceRule
 import LeanMetro.MarkovKernel
 import LeanMetro.WeightedSpace
+import LeanMetro.DirichletForm
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample
