@@ -124,6 +124,14 @@ A a(x,y) = B a(y,x) ≤ B
 
 ### Phase 3 — 가중 내적과 Dirichlet form
 
+진행 상태:
+
+- [x] `weightedInner`와 `markovOperator` 정의
+- [x] Markov operator의 선형성 및 상수 함수 보존
+- [x] reversibility에서 weighted self-adjointness
+- [ ] Dirichlet identity
+- [ ] Peskun domination에서 Dirichlet ordering
+
 산출물:
 
 - `LeanMetro/WeightedSpace.lean`

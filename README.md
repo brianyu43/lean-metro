@@ -72,7 +72,12 @@ proposal의 다른 reversible accept/reject 규칙보다 효율적인가”로 �
 MH maximality를 구조화된 kernel ordering으로 표현한다. 비대칭 2상태
 예제에서는 모든 proposal을 거절하는 admissible rule보다 MH의 `0 → 1`
 transition이 엄격히 큼을 계산하고 이 kernel ordering을 인스턴스화했다.
-다음 이론 층은 weighted operator와 Dirichlet form이다.
+
+`LeanMetro/WeightedSpace.lean`은 `π`-가중 내적과 Markov operator를
+정의하고, detailed balance를 이용해 reversible kernel의 Markov operator가
+weighted self-adjoint임을 증명한다. 다음 정리는 이 연산자에서 Dirichlet
+form을 만들고 Peskun domination이 Dirichlet form의 대소관계를 준다는
+것이다.
 
 ## 수치 예제
 
