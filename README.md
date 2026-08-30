@@ -5,8 +5,8 @@
 [English README](README.en.md)
 
 유한 상태공간 Metropolis–Hastings(MH) 알고리즘의 transition matrix,
-detailed balance, stationary distribution을 Lean 4로 형식 검증한 작은
-프로젝트다.
+detailed balance, stationary distribution, 그리고 stationary 표본평균의
+점근분산에 대한 Peskun ordering을 Lean 4로 형식 검증한 프로젝트다.
 
 프로젝트는 실수 `ℝ` 위의 양수 target weight와 유한합을 직접 사용한다.
 완전한 확률론 라이브러리를 먼저 설계하지 않고, MH correctness의 수학적
@@ -35,6 +35,18 @@ detailed balance, stationary distribution을 Lean 4로 형식 검증한 작은
   감소시킨다.
 - centered Poisson problem이 invertible이면 MH가 algebraic asymptotic
   variance를 최소화한다.
+- 각 유한 horizon에 실제 stationary Markov path probability measure를
+  구성한다.
+- 표본 수 `N=n+1`에 대해 실제 random-variable 표본평균의 분산이
+
+  ```text
+  N * Var(sample mean) = stationaryScaledVariance
+  ```
+
+  를 만족함을 증명한다.
+- Poisson remainder covariance가 0으로 수렴하면 이 실제 scaled variance가
+  algebraic asymptotic variance로 수렴하며, 같은 가정 아래 MH의 극한값이
+  임의 admissible accept/reject kernel보다 작거나 같다.
 
 대각항은 다른 상태로 실제 이동하고 남은 확률로 정의한다.
 
@@ -105,15 +117,22 @@ maximality부터 variance ordering까지를 한 정리로 합성한다.
 3상태 예제에서는 fast kernel과 lazy kernel의 분산이 각각 `2/3`, `2`다.
 두 예제 모두 직접 계산과 일반 Peskun 정리 적용을 함께 검증한다.
 
-현재 `asymptotic variance`는 Poisson 식으로 정의한 algebraic quantity다.
 `LeanMetro/VarianceLimit.lean`은 stationary covariance 형태의 유한시간 식이
 Poisson remainder의 Cesàro 평균만큼 algebraic variance와 다르다는 정확한
 항등식과, remainder covariance가 0으로 수렴할 때의 극한 정리를 증명한다.
-3상태 fast-kernel 예제에서는 이 극한이 `2/3`임을 검증한다.
+`LeanMetro/FinitePath.lean`부터 `LeanMetro/ProbabilisticPeskun.lean`까지는
+모든 horizon에 대해 실제 path PMF와 probability measure를 구성하고,
+mathlib의 `ProbabilityTheory.variance`로 계산한 표본평균 분산을 위 식과
+연결한다. 최종 정리는 다음이다.
 
-확률공간 위의 random-variable sample mean과 covariance 식의 동일성은 별도
-후속 stretch 단계이며,
-[정리 가정 감사](THEOREM_AUDIT.md)에 claim boundary를 기록했다.
+```text
+metropolisHastings_minimizes_sampleMeanAsymptoticVariance
+```
+
+3상태 회귀 예제에서는 fast kernel과 lazy kernel의 실제 표본평균
+점근분산이 각각 `2/3`, `2`이고 전자가 엄격히 작음을 검증한다. 필요한
+Poisson covariance decay도 fast와 lazy 양쪽에서 Lean으로 증명한다.
+[정리 가정 감사](THEOREM_AUDIT.md)는 정리의 가정과 남은 경계를 분리한다.
 
 ## 수치 예제
 
@@ -174,6 +193,11 @@ LeanMetro/
 ├── ThreeStateExample.lean
 ├── VarianceLimit.lean
 ├── VarianceLimitExample.lean
+├── FinitePath.lean
+├── StationaryMoments.lean
+├── SampleMeanVariance.lean
+├── ProbabilisticPeskun.lean
+├── SampleMeanVarianceExample.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
 ```
@@ -186,6 +210,10 @@ AcceptanceRule → MarkovKernel → WeightedSpace → DirichletForm
 MeanZero → Poisson → AsymptoticVariance → Peskun
                                          ↓
                                   VarianceLimit
+                                         ↓
+FinitePath → StationaryMoments → SampleMeanVariance
+                                         ↓
+                               ProbabilisticPeskun
 ```
 
 ## 빌드
@@ -206,12 +234,15 @@ lake env lean LeanMetro/Asymmetric.lean
 lake env lean LeanMetro/AsymmetricExample.lean
 lake env lean LeanMetro/Peskun.lean
 lake env lean LeanMetro/VarianceLimit.lean
+lake env lean LeanMetro/SampleMeanVariance.lean
+lake env lean LeanMetro/ProbabilisticPeskun.lean
 ```
 
 ## 의도적인 범위 제한
 
-이 프로젝트는 finite-state MH correctness와 명시적 Poisson-invertibility
-가정 아래의 algebraic Peskun theorem을 증명한다. 다음은 포함하지 않는다.
+이 프로젝트는 finite-state MH correctness와, 명시적 Poisson-invertibility 및
+covariance-decay 가정 아래 실제 stationary 표본평균의 점근분산 Peskun
+ordering을 증명한다. 다음은 포함하지 않는다.
 
 - 일반 irreducibility·aperiodicity 이론과 그로부터 Poisson invertibility를
   자동 도출하는 adapter
@@ -219,8 +250,10 @@ lake env lean LeanMetro/VarianceLimit.lean
 - convergence rate 또는 mixing time
 - 일반 측도공간의 `ProbabilityTheory.Kernel`
 - 부동소수점 sampler 구현의 정확성
-- 확률공간 위 random-variable sample mean과 `stationaryScaledVariance`의
-  동일성
+- 하나의 무한 경로공간 위에서 모든 시간 좌표를 동시에 구성하는
+  Kolmogorov extension 또는 Markov-chain CLT
+- 일반 irreducibility·aperiodicity만으로 covariance decay를 자동 도출하는
+  spectral adapter
 
 detailed balance와 stationarity만으로 임의 초기상태에서의 convergence가
 따라오는 것은 아니다.

@@ -29,29 +29,25 @@ scalar acceptance identity
 - [x] Phase 4 — mean-zero 공간과 Poisson equation
 - [x] Phase 5 — algebraic asymptotic variance와 Peskun theorem
 - [x] Phase 6a — covariance/Cesàro variance-limit bridge
-- [ ] Phase 6b — 확률공간 위의 Markov process variance identity (후속 stretch)
+- [x] Phase 6b — finite-path 확률공간과 실제 sample-mean variance identity
 
 ## 2. 최종 목표
 
 유한 상태공간 `S`, 양의 target weight `w`, stochastic proposal `q`,
-admissible acceptance `a`, 평균 0 함수 `f`에 대해 다음 최종 정리를 목표로
-한다.
+admissible acceptance `a`, 평균 0 함수 `f`에 대해 다음 최종 정리를
+완료했다.
 
-```lean
-theorem metropolisHastings_minimizes_algebraicAsymptoticVariance
-    (ha : AdmissibleAcceptance w q a)
-    (hinvMH : MeanZeroPoissonInvertible π mhKernel)
-    (hinvA : MeanZeroPoissonInvertible π acceptRejectKernel)
-    (hf : MeanZero π f) :
-    algebraicAsymptoticVariance π mhKernel hinvMH f hf ≤
-      algebraicAsymptoticVariance π acceptRejectKernel hinvA f hf := by
-  ...
+```text
+metropolisHastings_minimizes_sampleMeanAsymptoticVariance:
+  HasSampleMeanAsymptoticVariance(MH, σMH)
+  ∧ HasSampleMeanAsymptoticVariance(competitor, σA)
+  ∧ σMH ≤ σA
 ```
 
-필수 완료선은 finite-state Poisson-equation 표현으로 증명한 algebraic Peskun
-ordering이다. 확률변수의 장시간 분산 극한과 이 표현이 같다는 정리는 최종
-stretch goal이지만, 생략할 경우 두 정의를 같다고 주장하지 않고 경계를
-README에 명시한다.
+v1.0의 완료선은 finite-state Poisson-equation 표현으로 증명한 algebraic
+Peskun ordering이었다. Phase 6b에서는 각 유한 horizon의 실제 Markov path
+probability measure를 구성하고, 확률변수의 장시간 scaled variance 극한과
+이 algebraic 표현을 연결했다.
 
 ## 3. 수학적 범위와 설계 원칙
 
@@ -230,8 +226,11 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 
 후속 6b:
 
-- [ ] 확률공간 위의 stationary Markov process 구성
-- [ ] 실제 random-variable partial sum의 variance를 covariance 공식과 연결
+- [x] 모든 유한 horizon의 stationary Markov path PMF와 measure 구성
+- [x] 현재 상태의 주변분포와 path-sum second moment 도출
+- [x] 실제 random-variable sample mean의 variance를 covariance 공식과 연결
+- [x] 실제 scaled variance의 조건부 극한 정리
+- [x] MH와 admissible competitor의 실제 극한 및 ordering을 한 정리로 합성
 - [ ] irreducibility/aperiodicity 또는 spectral 가정에서 decay 자동 도출
 
 구현한 산출물:
@@ -241,16 +240,27 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 - `stationaryScaledVariance_tendsto_algebraicAsymptoticVariance`
 - `LeanMetro/VarianceLimitExample.lean`
 - `three_state_fast_scaledVariance_limit`
+- `LeanMetro/FinitePath.lean`
+- `ChainPath`, `stationaryPathPMF`, `stationaryPathMeasure`
+- `LeanMetro/StationaryMoments.lean`
+- `stationaryPath_current_expectation`, `stationaryPath_sum_secondMoment`
+- `LeanMetro/SampleMeanVariance.lean`
+- `chainSampleMean_scaledVariance_eq`, `chainSampleMean_scaledVariance_tendsto`
+- `LeanMetro/ProbabilisticPeskun.lean`
+- `metropolisHastings_minimizes_sampleMeanAsymptoticVariance`
+- `LeanMetro/SampleMeanVarianceExample.lean`
+- fast/lazy 3상태 실제 점근분산 극한 `2/3`, `2`
 
 진행 조건:
 
 - 6a의 극한 정리는 Poisson remainder covariance가 0으로 수렴한다는 가정을
   정리문에 노출한다.
-- 6b가 완료되기 전에는 `stationaryScaledVariance`를 실제 확률변수의
-  `n * Var(mean)`과 같다고 Lean이 증명했다고 주장하지 않는다.
-- 일반 확률과정·spectral adapter는 독립 후속 milestone로 유지한다.
+- 표본 수는 `N=n+1`이며 Lean은
+  `N * Var(chainSampleMean n) = stationaryScaledVariance n`을 증명한다.
+- 하나의 무한 경로공간, 일반 Markov-chain CLT, spectral decay adapter는
+  독립 후속 milestone로 유지한다.
 
-## 5. 예상 파일 구조
+## 5. 파일 구조
 
 ```text
 LeanMetro/
@@ -272,6 +282,11 @@ LeanMetro/
 ├── ThreeStateExample.lean
 ├── VarianceLimit.lean
 ├── VarianceLimitExample.lean
+├── FinitePath.lean
+├── StationaryMoments.lean
+├── SampleMeanVariance.lean
+├── ProbabilisticPeskun.lean
+├── SampleMeanVarianceExample.lean
 └── examples/
 ```
 
@@ -286,7 +301,7 @@ LeanMetro/
 | 9월 14일–10월 4일 | finite kernel, weighted operator, Dirichlet ordering | v0.3 |
 | 10월 5일–11월 초 | mean-zero, Poisson, inverse inequality | v0.4 |
 | 11월–12월 초 | 최종 Peskun 합성, 예제, 문서 | v1.0 후보 |
-| 남는 기간 | variance-limit 직접 연결 | stretch |
+| 8월 31일 | finite-path variance-limit 직접 연결 | v1.1 |
 
 ## 7. 검증과 릴리스 게이트
 

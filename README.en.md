@@ -3,7 +3,8 @@
 [![Lean CI](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml/badge.svg)](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml)
 
 Lean Metro is a Lean 4 formalization of finite-state Metropolis--Hastings
-correctness and the algebraic core of Peskun ordering.
+correctness and Peskun ordering for the asymptotic variance of an actual
+stationary sample mean.
 
 ## Main result
 
@@ -19,35 +20,54 @@ MH acceptance maximality
   => algebraic asymptotic-variance ordering
 ```
 
-The final theorem is:
+The algebraic theorem is:
 
 ```text
 metropolisHastings_minimizes_algebraicAsymptoticVariance
 ```
 
-It assumes that the centered Poisson problems for both kernels have unique
-solutions. This requirement is explicit through `MeanZeroPoissonInvertible`;
-the development does not silently infer it from unformalized irreducibility.
+The project then constructs a probability mass function and probability
+measure for every finite stationary Markov path. For a path of `N = n + 1`
+states, it proves with mathlib's literal `ProbabilityTheory.variance` that
+
+```text
+N * Var(sample mean) = stationaryScaledVariance.
+```
+
+Under an explicit Poisson-covariance decay assumption, the left-hand side
+converges to the algebraic asymptotic variance. The final probabilistic theorem
+is:
+
+```text
+metropolisHastings_minimizes_sampleMeanAsymptoticVariance
+```
+
+It returns both actual sample-mean variance limits and their Peskun ordering.
+Unique centered Poisson solutions and covariance decay are explicit theorem
+parameters; they are not silently inferred from unformalized irreducibility.
 
 ## Machine-checked examples
 
 - Two states: the MH and lazy-kernel algebraic variances are `3/2` and `6`.
 - Three states: the fast uniform and lazy-kernel variances are `2/3` and `2`.
+- For the three-state example, those last two values are also proved to be the
+  limits of the actual scaled sample-mean variances. The lazy decay is the
+  nontrivial geometric sequence `(1/2)^n`.
 - The identity kernel is rejected as a singular Poisson example because its
   fixed functions are not only constants.
 
-`VarianceLimit.lean` also proves an exact finite-time covariance remainder
-identity. If the Poisson remainder covariance tends to zero, the covariance
-formula converges to the algebraic asymptotic variance. The three-state fast
-kernel instantiates this theorem with limit `2/3`.
+`VarianceLimit.lean` proves the exact finite-time covariance remainder identity.
+`FinitePath.lean`, `StationaryMoments.lean`, and `SampleMeanVariance.lean`
+connect it to actual finite-path measures and random variables.
 
 ## Claim boundary
 
-The project does not yet construct a stationary random-variable Markov
-process and identify its literal `N * Var(sample mean)` with the finite-time
-covariance expression. It therefore calls the core result *algebraic*
-asymptotic variance. See [THEOREM_AUDIT.md](THEOREM_AUDIT.md) for all
-assumptions and exclusions.
+The project uses a separate probability space for each finite horizon; it
+does not construct one infinite path space through a Kolmogorov extension.
+It also does not derive covariance decay automatically from general
+irreducibility and aperiodicity, prove a Markov-chain CLT, or analyze mixing
+rates. See [THEOREM_AUDIT.md](THEOREM_AUDIT.md) for all assumptions and
+exclusions.
 
 ## Build
 

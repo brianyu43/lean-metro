@@ -16,5 +16,10 @@ import LeanMetro.PeskunExample
 import LeanMetro.ThreeStateExample
 import LeanMetro.VarianceLimit
 import LeanMetro.VarianceLimitExample
+import LeanMetro.FinitePath
+import LeanMetro.StationaryMoments
+import LeanMetro.SampleMeanVariance
+import LeanMetro.ProbabilisticPeskun
+import LeanMetro.SampleMeanVarianceExample
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample
