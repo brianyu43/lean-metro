@@ -60,8 +60,8 @@
 - [x] 전체 `lake build`
 - [x] `sorry`, `admit`, 사용자 `axiom` 0개
 - [x] `git diff --check`
-- [ ] GitHub Actions 성공
-- [ ] 버전 태그와 release
+- [x] GitHub Actions 성공
+- [x] 버전 태그와 release
 
 ## 4. 의도적으로 분리하는 범위
 
