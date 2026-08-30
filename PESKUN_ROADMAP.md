@@ -24,7 +24,7 @@ scalar acceptance identity
 
 - [x] Phase 0 — GitHub Actions clean build
 - [x] Phase 1 — generic acceptance, accept/reject transition, MH maximality
-- [ ] Phase 2 — finite reversible kernel 계층
+- [x] Phase 2 — finite reversible kernel 계층
 - [ ] Phase 3 — weighted operator와 Dirichlet ordering
 - [ ] Phase 4 — mean-zero 공간과 Poisson equation
 - [ ] Phase 5 — algebraic asymptotic variance와 Peskun theorem

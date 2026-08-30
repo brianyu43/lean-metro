@@ -1,4 +1,4 @@
-import LeanMetro.AcceptanceRule
+import LeanMetro.MarkovKernel
 import LeanMetro.TwoState
 
 namespace LeanMetro
@@ -101,5 +101,23 @@ theorem asymmetric_mh_strictly_dominates_reject_all :
     rejectAllAcceptance, mhAsymmetricTransition,
     mhAsymmetricAcceptedMove, mhAsymmetricAcceptance,
     twoStateWeight, asymmetricTwoStateProposal]
+
+theorem asymmetric_mh_kernel_peskun_dominates_reject_all :
+    PeskunDominates
+      (metropolisHastingsKernel
+        twoStateWeight asymmetricTwoStateProposal
+        two_state_weight_pos asymmetric_two_state_proposal_nonneg
+        asymmetric_two_state_proposal_row_sum)
+      (acceptRejectKernel
+        asymmetricTwoStateProposal rejectAllAcceptance
+        asymmetric_two_state_proposal_nonneg
+        asymmetric_two_state_proposal_row_sum
+        reject_all_acceptance_admissible.nonneg
+        reject_all_acceptance_admissible.le_one) := by
+  exact metropolisHastingsKernel_peskunDominates
+    twoStateWeight asymmetricTwoStateProposal rejectAllAcceptance
+    two_state_weight_pos asymmetric_two_state_proposal_nonneg
+    asymmetric_two_state_proposal_row_sum
+    reject_all_acceptance_admissible
 
 end LeanMetro

@@ -4,5 +4,6 @@ import LeanMetro.Transition
 import LeanMetro.Stationary
 import LeanMetro.Asymmetric
 import LeanMetro.AcceptanceRule
+import LeanMetro.MarkovKernel
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample

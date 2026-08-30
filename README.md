@@ -67,9 +67,12 @@ proposal의 다른 reversible accept/reject 규칙보다 효율적인가”로 �
 - `mhTransition_offDiagonal_dominates`: 모든 비대각 transition에서 MH가
   임의 admissible rule을 지배
 
-비대칭 2상태 예제에서는 모든 proposal을 거절하는 admissible rule보다 MH의
-`0 → 1` transition이 엄격히 큼을 계산했다. 다음 이론 층은 finite reversible
-kernel과 Dirichlet form이다.
+`LeanMetro/MarkovKernel.lean`은 `FiniteKernel`, `ReversibleKernel`,
+`PeskunDominates`를 정의한다. `metropolisHastingsKernel_peskunDominates`는
+MH maximality를 구조화된 kernel ordering으로 표현한다. 비대칭 2상태
+예제에서는 모든 proposal을 거절하는 admissible rule보다 MH의 `0 → 1`
+transition이 엄격히 큼을 계산하고 이 kernel ordering을 인스턴스화했다.
+다음 이론 층은 weighted operator와 Dirichlet form이다.
 
 ## 수치 예제
 
@@ -118,6 +121,7 @@ LeanMetro/
 ├── Stationary.lean
 ├── Asymmetric.lean
 ├── AcceptanceRule.lean
+├── MarkovKernel.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
 ```
