@@ -33,3 +33,7 @@ jobs:
             echo 'Lean sources contain sorry, admit, or a user-declared axiom.'
             exit 1
           fi
+
+      - name: Audit crown theorem dependencies
+        shell: bash
+        run: lake env lean LeanMetro/AxiomAudit.lean

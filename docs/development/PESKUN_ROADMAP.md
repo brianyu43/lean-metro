@@ -30,6 +30,8 @@ scalar acceptance identity
 - [x] Phase 5 — algebraic asymptotic variance와 Peskun theorem
 - [x] Phase 6a — covariance/Cesàro variance-limit bridge
 - [x] Phase 6b — finite-path 확률공간과 실제 sample-mean variance identity
+- [x] Phase 7a — normalized stationary finite irreducibility에서 centered Poisson inverse 자동 생성
+- [ ] Phase 7b — aperiodicity/spectral 가정에서 covariance decay 자동 생성
 
 ## 2. 최종 목표
 
@@ -257,8 +259,29 @@ theorem dirichletForm_mono_of_peskunDominates ... :
   정리문에 노출한다.
 - 표본 수는 `N=n+1`이며 Lean은
   `N * Var(chainSampleMean n) = stationaryScaledVariance n`을 증명한다.
-- 하나의 무한 경로공간, 일반 Markov-chain CLT, spectral decay adapter는
-  독립 후속 milestone로 유지한다.
+- 하나의 무한 경로공간과 일반 Markov-chain CLT는 독립 후속 milestone로
+  유지한다.
+
+### Phase 7 — 표준 ergodic 가정 adapter
+
+완료한 7a:
+
+- [x] `FiniteKernel.Irreducible P := Matrix.IsIrreducible P.prob`
+- [x] finite maximum principle로 fixed points가 상수임을 증명
+- [x] mean-zero 함수들을 실제 `Submodule`로 구성
+- [x] `I-P`를 mean-zero subspace의 `LinearMap`으로 구성
+- [x] 유한차원 injective → surjective로 centered Poisson solvability 도출
+- [x] `meanZeroPoissonInvertible_of_irreducible` 완성
+- [x] 2상태 MH와 lazy competitor에서 새 adapter를 실제 사용
+
+남은 7b:
+
+- [ ] irreducible·aperiodic reversible kernel의 mean-zero spectral decay
+- [ ] 위 결과에서 crown theorem의 covariance-decay 인자 자동 생성
+
+7a는 crown theorem의 Poisson-invertibility 가정을 normalized stationarity와
+표준 irreducibility로 닫는다. 7b가 완료되기 전에는 일반적인 decay를 자동
+도출한다고 주장하지 않는다.
 
 ## 5. 파일 구조
 
@@ -276,6 +299,8 @@ LeanMetro/
 ├── MeanZero.lean
 ├── Poisson.lean
 ├── PoissonExample.lean
+├── Irreducibility.lean
+├── IrreducibilityExample.lean
 ├── AsymptoticVariance.lean
 ├── Peskun.lean
 ├── PeskunExample.lean
@@ -287,7 +312,10 @@ LeanMetro/
 ├── SampleMeanVariance.lean
 ├── ProbabilisticPeskun.lean
 ├── SampleMeanVarianceExample.lean
-└── examples/
+├── CrownExample.lean
+├── AxiomAudit.lean
+├── TwoState.lean
+└── AsymmetricExample.lean
 ```
 
 실제 의존성이 더 단순해지는 경우 파일을 합칠 수 있지만, 서로 다른 이론
@@ -302,6 +330,7 @@ LeanMetro/
 | 10월 5일–11월 초 | mean-zero, Poisson, inverse inequality | v0.4 |
 | 11월–12월 초 | 최종 Peskun 합성, 예제, 문서 | v1.0 후보 |
 | 8월 31일 | finite-path variance-limit 직접 연결 | v1.1 |
+| 8월 31일 | irreducibility adapter, crown integration, audit·포장 | v1.2 |
 
 ## 7. 검증과 릴리스 게이트
 
@@ -338,6 +367,7 @@ git ls-remote origin refs/heads/main
 4. Mean-zero 공간과 Poisson equation
 5. Inverse inequality와 asymptotic variance
 6. 확률적 variance-limit 연결
+7. 표준 irreducibility·spectral adapter
 
 알림에는 새 정의, 필요한 가정, 이전 단계에서 재사용하는 정리, 이번 단계의
 컴파일 완료 기준을 짧게 포함한다.

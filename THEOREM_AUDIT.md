@@ -25,8 +25,9 @@ probability measure 위 표본평균의 scaled variance 극한을 제공하고, 
   수렴한다.
 
 마지막 두 조건은 각각 `MeanZeroPoissonInvertible`과 `Tendsto` theorem
-parameter다. 따라서 irreducibility나 spectral gap을 구현하지 않은 상태에서
-invertibility 또는 decay를 암묵적으로 사용하지 않는다.
+parameter다. crown theorem 자체는 둘을 명시적으로 받지만, 아래의
+irreducibility adapter가 첫 번째 조건을 표준 가정에서 생성한다. decay는
+여전히 theorem parameter이므로 암묵적으로 사용하지 않는다.
 
 ## Lean에서 증명된 연결
 
@@ -50,6 +51,39 @@ finite stationary path PMF/Measure
 비음수성과 전체 합 1, 그리고 `PMF.toMeasure`가 probability measure라는
 사실까지 Lean이 검사한다.
 
+## 공리 의존성 감사
+
+`LeanMetro/AxiomAudit.lean`은 crown theorem에 대해 `#print axioms`를
+실행하고 `#guard_msgs`로 다음 결과를 컴파일 시 고정한다.
+
+```text
+[propext, Classical.choice, Quot.sound]
+```
+
+이는 함수·명제 extensionality, `poissonSolution` 선택, quotient soundness에
+대한 Lean의 표준 의존성이다. `sorryAx`나 프로젝트 고유 공리가 추가되어
+출력이 바뀌면 전용 audit 모듈과 CI가 실패한다.
+
+## Irreducibility adapter
+
+`LeanMetro/Irreducibility.lean`은 `FiniteKernel.Irreducible P`를 mathlib의
+`Matrix.IsIrreducible P.prob`로 정의한다. normalized stationary mass를 가진
+finite kernel에서 다음 연결을 Lean으로 증명한다.
+
+```text
+finite irreducibility
+  ⇒ maximum principle
+  ⇒ FixedPointsAreConstants
+  ⇒ I-P is injective on the mean-zero Submodule
+  ⇒ finite-dimensional injective → surjective
+  ⇒ MeanZeroPoissonInvertible
+```
+
+최종 adapter는 `meanZeroPoissonInvertible_of_irreducible`이다. 2상태 MH와
+lazy competitor가 이 정리를 사용해 기존 hand-built Poisson inverse와 같은
+인터페이스를 자동 생성한다. 이는 covariance decay까지 자동 생성하지는
+않는다.
+
 ## 수치 회귀 예제
 
 3상태 uniform target에서 다음을 증명한다.
@@ -59,10 +93,18 @@ finite stationary path PMF/Measure
 - lazy Poisson covariance는 `(4/3) * (1/2)^n`이므로 0으로 수렴
 - `2/3 < 2`
 
+`LeanMetro/CrownExample.lean`은 기존 수치 결과를 따로 비교하는 데서
+그치지 않는다. 동일한 `twoStateWeight`, `twoStateProposal`에 대해 MH
+acceptance의 절반인 admissible competitor를 구성하고, 양쪽 Poisson inverse와
+covariance decay를 증명한 후
+`metropolisHastings_minimizes_sampleMeanAsymptoticVariance`를 직접 호출한다.
+최종 결과는 실제 scaled sample-mean variance 극한 `3/2`, `6`과
+`3/2 ≤ 6`이다.
+
 ## 아직 주장하지 않는 것
 
-- irreducibility·aperiodicity에서 `MeanZeroPoissonInvertible` 또는 covariance
-  decay를 자동 도출하는 일반 정리
+- 일반 aperiodicity 또는 spectral-gap 가정에서 covariance decay를 자동
+  도출하는 정리
 - 하나의 무한 경로공간에서 모든 좌표과정을 동시에 구성하는 Kolmogorov
   extension
 - Markov-chain central limit theorem 또는 분포수렴

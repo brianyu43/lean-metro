@@ -4,13 +4,18 @@
 
 [English README](README.en.md)
 
-유한 상태공간 Metropolis–Hastings(MH) 알고리즘의 transition matrix,
-detailed balance, stationary distribution, 그리고 stationary 표본평균의
-점근분산에 대한 Peskun ordering을 Lean 4로 형식 검증한 프로젝트다.
+유한 상태 Metropolis–Hastings correctness와 실제 stationary 표본평균의
+Peskun asymptotic-variance ordering을 Lean 4로 형식 검증한다.
 
-프로젝트는 실수 `ℝ` 위의 양수 target weight와 유한합을 직접 사용한다.
-완전한 확률론 라이브러리를 먼저 설계하지 않고, MH correctness의 수학적
-골격이 Lean 코드에서 보이도록 구성했다.
+주정리 `metropolisHastings_minimizes_sampleMeanAsymptoticVariance`는 동일한
+target·proposal을 쓰는 MH와 admissible competitor의 실제 scaled-variance
+극한을 구성하고 MH의 극한값이 더 크지 않음을 증명한다. 유한 비공집합,
+양의 target, stochastic proposal, centered observable, 양쪽 centered Poisson
+invertibility와 covariance decay를 명시적으로 받는다. 다만 normalized
+stationarity와 finite irreducibility에서는 Poisson invertibility를 프로젝트
+내부 adapter로 자동 생성한다. 무한 path space, CLT, 일반 aperiodicity에서 covariance decay의
+자동 도출은 아직 주장하지 않는다.
+[정리 감사](THEOREM_AUDIT.md) · [증명 소유권 가이드](docs/PROOF_OWNERSHIP_GUIDE.md) · [변경 기록](CHANGELOG.md) · [MIT 라이선스](LICENSE)
 
 ## 최종 결과
 
@@ -73,7 +78,7 @@ P(x,x) = 1 - ∑ y ≠ x, q(x,y) * acceptance(x,y)
 
 ## Part II: Peskun ordering
 
-[장기 로드맵](PESKUN_ROADMAP.md)에 따라 “MH가 맞다”에서 “왜 MH가 같은
+[장기 로드맵](docs/development/PESKUN_ROADMAP.md)에 따라 “MH가 맞다”에서 “왜 MH가 같은
 proposal의 다른 reversible accept/reject 규칙보다 효율적인가”로 확장하고
 있다.
 
@@ -106,6 +111,14 @@ form을 크게 만든다는 정리를 제공한다.
 직접 구성한다. 반대로 identity chain은 모든 함수가 고정점이므로 필요한
 고정점 조건을 만족하지 않는다는 singular 회귀 예제도 포함한다.
 
+`LeanMetro/Irreducibility.lean`은 mathlib의 표준
+`Matrix.IsIrreducible`을 finite kernel에 연결한다. 최대원리로
+irreducibility에서 `FixedPointsAreConstants`를 도출하고, mean-zero
+`Submodule` 위 `I-P`를 `LinearMap`으로 묶어 유한차원 단사⇒전사를 적용한다.
+따라서 `meanZeroPoissonInvertible_of_irreducible`은 기존의 Poisson
+invertibility 가정을 자동 생성한다. 2상태 MH와 lazy 예제가 이 adapter를
+실제로 사용한다.
+
 `LeanMetro/AsymptoticVariance.lean`은 Poisson 해로 inverse quadratic form과
 algebraic asymptotic variance를 정의하고, Dirichlet ordering에서 inverse
 ordering을 도출한다. `LeanMetro/Peskun.lean`의
@@ -132,6 +145,9 @@ metropolisHastings_minimizes_sampleMeanAsymptoticVariance
 3상태 회귀 예제에서는 fast kernel과 lazy kernel의 실제 표본평균
 점근분산이 각각 `2/3`, `2`이고 전자가 엄격히 작음을 검증한다. 필요한
 Poisson covariance decay도 fast와 lazy 양쪽에서 Lean으로 증명한다.
+`LeanMetro/CrownExample.lean`은 동일한 2상태 target·proposal에서 MH와
+half-acceptance competitor를 만들고 최종 probabilistic theorem을 직접
+호출해 실제 극한 `3/2 ≤ 6`을 얻는 end-to-end integration test다.
 [정리 가정 감사](THEOREM_AUDIT.md)는 정리의 가정과 남은 경계를 분리한다.
 
 ## 수치 예제
@@ -187,6 +203,8 @@ LeanMetro/
 ├── MeanZero.lean
 ├── Poisson.lean
 ├── PoissonExample.lean
+├── Irreducibility.lean
+├── IrreducibilityExample.lean
 ├── AsymptoticVariance.lean
 ├── Peskun.lean
 ├── PeskunExample.lean
@@ -198,6 +216,8 @@ LeanMetro/
 ├── SampleMeanVariance.lean
 ├── ProbabilisticPeskun.lean
 ├── SampleMeanVarianceExample.lean
+├── CrownExample.lean
+├── AxiomAudit.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
 ```
@@ -240,20 +260,19 @@ lake env lean LeanMetro/ProbabilisticPeskun.lean
 
 ## 의도적인 범위 제한
 
-이 프로젝트는 finite-state MH correctness와, 명시적 Poisson-invertibility 및
-covariance-decay 가정 아래 실제 stationary 표본평균의 점근분산 Peskun
-ordering을 증명한다. 다음은 포함하지 않는다.
+이 프로젝트는 finite-state MH correctness와, normalized stationarity 및
+finite irreducibility에서 자동 생성한 Poisson invertibility, 그리고 명시적 covariance-decay 가정 아래
+실제 stationary 표본평균의 점근분산 Peskun ordering을 증명한다. 다음은
+포함하지 않는다.
 
-- 일반 irreducibility·aperiodicity 이론과 그로부터 Poisson invertibility를
-  자동 도출하는 adapter
+- 일반 aperiodicity·spectral gap에서 covariance decay를 자동 도출하는
+  adapter
 - 임의 초기분포에서 stationary distribution으로의 convergence
 - convergence rate 또는 mixing time
 - 일반 측도공간의 `ProbabilityTheory.Kernel`
 - 부동소수점 sampler 구현의 정확성
 - 하나의 무한 경로공간 위에서 모든 시간 좌표를 동시에 구성하는
   Kolmogorov extension 또는 Markov-chain CLT
-- 일반 irreducibility·aperiodicity만으로 covariance decay를 자동 도출하는
-  spectral adapter
 
 detailed balance와 stationarity만으로 임의 초기상태에서의 convergence가
 따라오는 것은 아니다.
