@@ -1,5 +1,7 @@
 # 린메트로
 
+[![Lean CI](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml/badge.svg)](https://github.com/brianyu43/lean-metro/actions/workflows/lean.yml)
+
 유한 상태공간 Metropolis–Hastings(MH) 알고리즘의 transition matrix,
 detailed balance, stationary distribution을 Lean 4로 형식 검증한 작은
 프로젝트다.

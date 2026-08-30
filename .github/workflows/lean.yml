@@ -1,0 +1,35 @@
+name: Lean CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Lean, restore mathlib cache, and build
+        uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+          use-mathlib-cache: true
+
+      - name: Reject unfinished or assumed proofs
+        shell: bash
+        run: |
+          if grep -R -n -E \
+            '(^|[^[:alnum:]_])(sorry|admit|axiom)([^[:alnum:]_]|$)' \
+            --include='*.lean' LeanMetro LeanMetro.lean; then
+            echo 'Lean sources contain sorry, admit, or a user-declared axiom.'
+            exit 1
+          fi
