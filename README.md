@@ -86,8 +86,20 @@ form을 크게 만든다는 정리를 제공한다.
 직접 구성한다. 반대로 identity chain은 모든 함수가 고정점이므로 필요한
 고정점 조건을 만족하지 않는다는 singular 회귀 예제도 포함한다.
 
-다음 이론 층은 inverse quadratic form과 algebraic asymptotic variance다.
-이 층에서 Dirichlet ordering을 최종 variance ordering으로 옮긴다.
+`LeanMetro/AsymptoticVariance.lean`은 Poisson 해로 inverse quadratic form과
+algebraic asymptotic variance를 정의하고, Dirichlet ordering에서 inverse
+ordering을 도출한다. `LeanMetro/Peskun.lean`의
+`metropolisHastings_minimizes_algebraicAsymptoticVariance`는 MH acceptance
+maximality부터 variance ordering까지를 한 정리로 합성한다.
+
+`LeanMetro/PeskunExample.lean`의 2상태 예제에서는 MH와 lazy kernel의
+분산이 각각 `3/2`, `6`이다. `LeanMetro/ThreeStateExample.lean`의 uniform
+3상태 예제에서는 fast kernel과 lazy kernel의 분산이 각각 `2/3`, `2`다.
+두 예제 모두 직접 계산과 일반 Peskun 정리 적용을 함께 검증한다.
+
+현재 `asymptotic variance`는 Poisson 식으로 정의한 algebraic quantity다.
+stationary chain의 실제 분산 극한과의 동일성은 별도 stretch 단계이며,
+[정리 가정 감사](THEOREM_AUDIT.md)에 claim boundary를 기록했다.
 
 ## 수치 예제
 

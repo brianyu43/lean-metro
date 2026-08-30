@@ -27,7 +27,7 @@ scalar acceptance identity
 - [x] Phase 2 — finite reversible kernel 계층
 - [x] Phase 3 — weighted operator와 Dirichlet ordering
 - [x] Phase 4 — mean-zero 공간과 Poisson equation
-- [ ] Phase 5 — algebraic asymptotic variance와 Peskun theorem
+- [x] Phase 5 — algebraic asymptotic variance와 Peskun theorem
 - [ ] Phase 6 — 확률적 variance-limit 연결
 
 ## 2. 최종 목표
@@ -187,6 +187,15 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 
 ### Phase 5 — Algebraic asymptotic variance와 Peskun theorem
 
+진행 상태:
+
+- [x] inverse quadratic form
+- [x] algebraic asymptotic variance
+- [x] inverse ordering 분해 정리
+- [x] 최종 MH 합성 정리
+- [x] 2상태·3상태 수치 예제
+- [x] 가정과 claim boundary audit
+
 산출물:
 
 - `LeanMetro/AsymptoticVariance.lean`
@@ -202,7 +211,7 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 
 완료 기준:
 
-- `metropolisHastings_minimizes_asymptoticVariance` 컴파일
+- `metropolisHastings_minimizes_algebraicAsymptoticVariance` 컴파일
 - 2상태와 3상태 수치 예제
 - 가정 누락 여부에 대한 별도 theorem audit
 
@@ -240,6 +249,8 @@ LeanMetro/
 ├── PoissonExample.lean
 ├── AsymptoticVariance.lean
 ├── Peskun.lean
+├── PeskunExample.lean
+├── ThreeStateExample.lean
 └── examples/
 ```
 
