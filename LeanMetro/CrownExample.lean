@@ -1,4 +1,4 @@
-import LeanMetro.ProbabilisticPeskun
+import LeanMetro.IrreduciblePeskun
 import LeanMetro.IrreducibilityExample
 
 namespace LeanMetro
@@ -296,5 +296,75 @@ theorem two_state_crown_actual_limits_and_order :
     two_state_mh_algebraicAsymptoticVariance,
     two_state_lazy_algebraicAsymptoticVariance] using
       two_state_crown_theorem
+
+theorem two_state_crown_mh_irreducible :
+    twoStateCrownMHKernel.Irreducible := by
+  rw [two_state_crown_mhKernel_eq]
+  exact two_state_mh_irreducible
+
+theorem two_state_crown_competitor_irreducible :
+    twoStateCrownCompetitorKernel.Irreducible := by
+  rw [two_state_crown_competitorKernel_eq]
+  exact two_state_lazy_irreducible
+
+/-- Direct use of the v1.3 standard-assumption wrapper. Unlike
+`two_state_crown_theorem`, this proof supplies neither Poisson inverses nor
+pointwise covariance-decay theorems. -/
+theorem two_state_crown_theorem_of_irreducible :
+    HasSampleMeanAsymptoticVariance
+        (normalizedWeight twoStateWeight) twoStateCrownMHKernel
+        (normalizedWeight_nonneg twoStateWeight two_state_weight_pos)
+        (normalizedWeight_sum twoStateWeight two_state_weight_pos)
+        twoStateCenteredObservable
+        (algebraicAsymptoticVariance
+          (normalizedWeight twoStateWeight) twoStateCrownMHKernel
+          two_state_crown_mh_meanZeroPoissonInvertible
+          twoStateCenteredObservable two_state_crown_observable_meanZero) ∧
+      HasSampleMeanAsymptoticVariance
+        (normalizedWeight twoStateWeight) twoStateCrownCompetitorKernel
+        (normalizedWeight_nonneg twoStateWeight two_state_weight_pos)
+        (normalizedWeight_sum twoStateWeight two_state_weight_pos)
+        twoStateCenteredObservable
+        (algebraicAsymptoticVariance
+          (normalizedWeight twoStateWeight) twoStateCrownCompetitorKernel
+          two_state_crown_competitor_meanZeroPoissonInvertible
+          twoStateCenteredObservable two_state_crown_observable_meanZero) ∧
+      algebraicAsymptoticVariance
+          (normalizedWeight twoStateWeight) twoStateCrownMHKernel
+          two_state_crown_mh_meanZeroPoissonInvertible
+          twoStateCenteredObservable two_state_crown_observable_meanZero ≤
+        algebraicAsymptoticVariance
+          (normalizedWeight twoStateWeight) twoStateCrownCompetitorKernel
+          two_state_crown_competitor_meanZeroPoissonInvertible
+          twoStateCenteredObservable two_state_crown_observable_meanZero := by
+  simpa only using
+    metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible
+      twoStateWeight twoStateProposal twoStateHalfMHAcceptance
+      two_state_weight_pos two_state_proposal_nonneg
+      two_state_proposal_row_sum
+      two_state_halfMHAcceptance_admissible
+      two_state_crown_mh_irreducible
+      two_state_crown_competitor_irreducible
+      twoStateCenteredObservable two_state_crown_observable_meanZero
+
+/-- End-to-end concrete consequence of the irreducibility-facing wrapper:
+actual scaled sample-mean variance limits `3/2` and `6`, without any decay or
+Poisson-inverse argument at the call site. -/
+theorem two_state_crown_actual_limits_and_order_of_irreducible :
+    HasSampleMeanAsymptoticVariance
+        twoStateStationary twoStateFiniteKernel
+        two_state_stationary_nonneg two_state_stationary_sum
+        twoStateCenteredObservable (3 / 2 : ℝ) ∧
+      HasSampleMeanAsymptoticVariance
+        twoStateStationary twoStateLazyKernel
+        two_state_stationary_nonneg two_state_stationary_sum
+        twoStateCenteredObservable 6 ∧
+      (3 / 2 : ℝ) ≤ 6 := by
+  simpa only [two_state_normalizedWeight_eq_stationary,
+    two_state_crown_mhKernel_eq,
+    two_state_crown_competitorKernel_eq,
+    two_state_mh_algebraicAsymptoticVariance,
+    two_state_lazy_algebraicAsymptoticVariance] using
+      two_state_crown_theorem_of_irreducible
 
 end LeanMetro

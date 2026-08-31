@@ -17,12 +17,16 @@ import LeanMetro.Peskun
 import LeanMetro.PeskunExample
 import LeanMetro.ThreeStateExample
 import LeanMetro.VarianceLimit
+import LeanMetro.ReversibleVarianceLimit
 import LeanMetro.VarianceLimitExample
 import LeanMetro.FinitePath
 import LeanMetro.StationaryMoments
 import LeanMetro.SampleMeanVariance
+import LeanMetro.ReversibleSampleMeanVariance
 import LeanMetro.ProbabilisticPeskun
+import LeanMetro.IrreduciblePeskun
 import LeanMetro.SampleMeanVarianceExample
 import LeanMetro.CrownExample
+import LeanMetro.PeriodicVarianceExample
 import LeanMetro.TwoState
 import LeanMetro.AsymmetricExample
