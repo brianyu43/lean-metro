@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## [v1.3.0] — 2026-08-31
+
+- Removed the pointwise Poisson-covariance-decay assumption from the actual
+  stationary sample-mean variance limit by proving an exact reversible
+  telescope and a uniform finite-state Markov-iterate bound.
+- Added `metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible`,
+  whose public inputs use finite irreducibility for the generated MH and
+  competitor kernels rather than supplied Poisson inverses or decay proofs.
+- Added a direct two-state crown regression through the new public wrapper and
+  fixed its full theorem dependency set with a compile-time axiom audit.
+- Added a period-two reversible example where pointwise Poisson covariance does
+  not converge to zero but the actual scaled sample-mean variance still tends
+  to its algebraic value.
+
+Detailed notes: [docs/releases/RELEASE_NOTES_V1.3.md](docs/releases/RELEASE_NOTES_V1.3.md)
+
 ## [v1.2.0] — 2026-08-31
 
 - Added `meanZeroPoissonInvertible_of_irreducible`, deriving the centered
@@ -44,6 +60,7 @@ Detailed notes: [docs/releases/RELEASE_NOTES.md](docs/releases/RELEASE_NOTES.md)
 - Proved symmetric and zero-safe asymmetric MH stochasticity, detailed
   balance, and stationarity.
 
+[v1.3.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.3.0
 [v1.2.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.2.0
 [v1.1.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.1.0
 [v1.0.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.0.0

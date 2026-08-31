@@ -55,11 +55,12 @@ MH accepted-flow 최대성
   → Dirichlet form 증가
   → Poisson inverse quadratic form 감소
   → algebraic asymptotic variance 감소
-  → finite-path variance identity와 decay를 통해 실제 표본평균 분산 극한 비교
+  → finite-path variance identity와 reversible telescoping으로 실제 분산 극한 비교
 ```
 
 여기서 irreducibility adapter는 Poisson inverse의 존재와 유일성을 공급한다.
-아직 일반 정리로 남아 있는 spectral adapter는 covariance decay를 공급해야 한다.
+variance limit에는 pointwise covariance decay가 필요하지 않다. spectral
+adapter는 `P^n g → 0`, mixing, quantitative rate를 원할 때 남는 별도 과제다.
 
 ---
 
@@ -414,7 +415,8 @@ injective이면 surjective이므로 모든 centered `f`에 대해 `Lg=f`인 cent
 
 현재 저장소는 이 adapter를 `meanZeroPoissonInvertible_of_irreducible`로 실제
 증명한다. 따라서 평가 당시 지적된 Poisson-invertibility 공백은 현재 작업
-트리에서는 닫혔다. 다만 covariance decay adapter까지 닫힌 것은 아니다.
+트리에서는 닫혔다. Pointwise covariance decay adapter는 없지만, 다음 절의
+telescoping 정리가 variance limit에서 그 조건 자체를 제거한다.
 
 ### 5분 칠판 설명
 
@@ -507,7 +509,7 @@ linear map을 만들었기 때문에 mathlib의 표준 유한차원 정리를 �
   strictly positive transition edge의 quiver가 strongly connected라는 뜻이다.
 - 정리는 finite state, normalized stationary mass, stationarity를 요구한다.
 - 이 adapter는 Poisson solution의 존재와 유일성을 닫지만 `Pⁿg→0`이나
-  covariance decay는 닫지 않는다.
+  covariance decay는 닫지 않는다. 두 성질은 variance limit에는 필요하지 않다.
 - irreducible만으로 decay는 충분하지 않다. 예를 들어 deterministic two-cycle은
   irreducible이지만 period가 2이고 eigenvalue `-1` 때문에 진동할 수 있다.
 
@@ -523,160 +525,136 @@ linear map을 만들었기 때문에 mathlib의 표준 유한차원 정리를 �
 
 ---
 
-## 4. aperiodicity 또는 spectral gap은 왜 covariance decay를 주는가?
+## 4. 왜 variance limit에는 pointwise covariance decay가 필요하지 않은가?
 
 ### 60초 답변
 
-finite reversible chain에서 `P`는 `L²(π)`의 self-adjoint operator다. 따라서
-orthonormal eigenbasis를 갖고 eigenvalue는 실수다. Irreducibility는 eigenvalue
-`1`의 eigenspace가 상수함수뿐임을 보장한다. Centered subspace에서는 그
-상수방향이 제거된다. Aperiodicity까지 있으면 나머지 eigenvalue는 모두
+기존 exact formula의 remainder는
 
 $$
-|\lambda_i|<1
+\frac{2}{n+1}\sum_{k=0}^{n}\langle f,P^{k+1}g\rangle_\pi,
+\qquad (I-P)g=f
 $$
 
-이고, 유한개이므로 `ρ=max |λᵢ|<1`이다. 따라서 centered Poisson solution을
-`g=∑cᵢeᵢ`로 쓰면
+다. `c_k=⟨g,P^kg⟩π`라고 하자. Poisson equation과 reversibility의
+self-adjointness를 쓰면
 
 $$
-P^ng=\sum_i c_i\lambda_i^n e_i\to0.
+\langle f,P^kg\rangle_\pi=c_k-c_{k+1}.
 $$
 
-Cauchy–Schwarz로 `|⟨f,Pⁿg⟩π|≤‖f‖π‖Pⁿg‖π→0`이므로 프로젝트가 요구하는
-covariance decay가 나온다. 여기서 필요한 것은 보통 gap `1-λ₂`만이 아니라
-negative eigenvalue까지 제어하는 **absolute spectral gap**이다.
-
-이 논증은 현재 프로젝트의 다음 자연스러운 adapter 설계지만, 일반 theorem으로
-아직 Lean에 들어 있지 않다. 현재 crown theorem은 decay를 명시적 parameter로
-받고, 구체 예제에서는 geometric formula를 직접 증명해 그 parameter를 닫는다.
+따라서 합은 `c₁-cₙ₊₂`로 망원합된다. finite Markov operator는 함수값의
+uniform absolute bound를 보존하므로 `c_n`은 bounded다. 결국 bounded한 두
+endpoint의 차이를 `n+1`로 나눈 값은 0으로 간다. `P^ng` 자체는 수렴할
+필요가 없고 aperiodicity도 필요 없다.
 
 ### 5분 칠판 설명
 
-#### 1단계: 왜 reversibility가 spectral argument를 가능하게 하는가
+#### 1단계: exact finite-time remainder에서 시작한다
 
-Detailed balance
-
-$$
-\pi(x)P(x,y)=\pi(y)P(y,x)
-$$
-
-를 쓰면
+프로젝트는 이미 표본 수 `N=n+1`에 대해
 
 $$
-\langle f,Pg\rangle_\pi=\langle Pf,g\rangle_\pi.
+V_n=\sigma_{\rm alg}^2-
+\frac{2}{n+1}\sum_{k=0}^{n}
+\langle f,P^{k+1}g\rangle_\pi
 $$
 
-즉 `P`는 weighted inner product에서 self-adjoint다. `π(x)>0`이면 이 weighted
-form은 실제 inner product가 되고, finite-dimensional spectral theorem을 적용할
-수 있다.
+를 증명했다. 여기서 확률적 극한을 추측하지 않고 이 유한합을 직접 줄인다.
 
-#### 2단계: eigenvalue `1` 방향을 제거한다
+#### 2단계: 한 lag을 discrete difference로 바꾼다
 
-Markov kernel은 `P1=1`을 만족하므로 상수함수는 eigenvalue `1`의 eigenvector다.
-Irreducibility의 maximum principle은 `Ph=h`인 함수가 상수뿐이라고 말한다.
-따라서 `1`-eigenspace는 정확히 상수방향이고, centered subspace `H₀`에는 이
-방향이 남지 않는다.
-
-#### 3단계: 왜 aperiodicity가 필요한가
-
-Irreducible이기만 한 chain에는 modulus가 1인 다른 eigenvalue가 있을 수 있다.
-reversible chain에서는 대표적으로 `-1`이 문제다. 두 상태를 매번 번갈아 가는
-chain은 `Pⁿg=(-1)ⁿg`처럼 진동하므로 0으로 가지 않는다.
-
-finite irreducible aperiodic chain에서는 `1` 이외의 peripheral eigenvalue가
-없다. Reversible이라 eigenvalue가 실수이므로 centered subspace의 모든
-eigenvalue가 `(-1,1)` 안에 놓인다. eigenvalue가 유한개라
+`f=(I-P)g`이므로
 
 $$
-\rho=\max_{\lambda_i\ne1}|\lambda_i|<1
+\begin{aligned}
+\langle f,P^kg\rangle_\pi
+&=\langle g-Pg,P^kg\rangle_\pi\\
+&=\langle g,P^kg\rangle_\pi-\langle Pg,P^kg\rangle_\pi.
+\end{aligned}
 $$
 
-을 잡을 수 있다.
-
-#### 4단계: geometric decay
-
-centered `g`를 eigenbasis로 전개하면
+reversibility는 `P`가 weighted pairing에서 self-adjoint라는 뜻이므로
 
 $$
-g=\sum_i c_ie_i,
-\qquad
-P^ng=\sum_i c_i\lambda_i^ne_i.
+\langle Pg,P^kg\rangle_\pi
+=\langle g,P(P^kg)\rangle_\pi
+=\langle g,P^{k+1}g\rangle_\pi.
 $$
 
-따라서
+따라서 한 항은 정확히 `c_k-c_{k+1}`이다.
+
+#### 3단계: 인덱스를 확인하며 망원합한다
+
+remainder의 lag은 `k+1`부터 시작하므로
 
 $$
-\|P^ng\|_\pi^2
-=\sum_i c_i^2|\lambda_i|^{2n}
-\le\rho^{2n}\|g\|_\pi^2.
+\sum_{k=0}^{n}\langle f,P^{k+1}g\rangle_\pi
+=\sum_{k=0}^{n}(c_{k+1}-c_{k+2})
+=c_1-c_{n+2}.
 $$
 
-그리고
+`N=n+1`로 쓰면 마지막 항은 `c_{N+1}`이다. 이 off-by-one을 말로 얼버무리지
+말고 칠판에서 직접 두세 항을 써서 확인해야 한다.
+
+#### 4단계: 수렴 대신 boundedness만 증명한다
+
+모든 `x`에서 `|h(x)|≤C`이면
 
 $$
-|\langle f,P^ng\rangle_\pi|
-\le\|f\|_\pi\|P^ng\|_\pi
-\le\|f\|_\pi\|g\|_\pi\rho^n\to0.
+|(Ph)(x)|
+\le\sum_yP(x,y)|h(y)|
+\le C\sum_yP(x,y)=C.
 $$
 
-이 마지막 결론이 `stationaryScaledVariance_tendsto_...`가 받는 `hdecay`와
-정확히 같은 형태다.
-
-#### 5단계: “spectral gap”이라는 말을 조심한다
-
-일부 문헌의 spectral gap은 `1-λ₂`만 뜻한다. 이것만으로는 `λ=-1`을 막지
-못한다. 여기서 바로 필요한 양은
+따라서 모든 `n,x`에 대해 `|P^ng(x)|≤∑_y|g(y)|`이다. 유한합인 weighted
+pairing도 어떤 상수 `B`에 대해 `|c_n|≤B`다. 그러므로
 
 $$
-1-\max_{i\ge2}|\lambda_i|,
+\left|\frac{2(c_1-c_{n+2})}{n+1}\right|
+\le\frac{4B}{n+1}\to0.
 $$
 
-즉 absolute spectral gap이다. 또는 finite irreducibility와 aperiodicity를 함께
-사용해 모든 nonconstant eigenvalue의 절댓값이 1보다 작음을 도출해야 한다.
+#### 5단계: periodic chain으로 가정 차이를 확인한다
+
+deterministic two-cycle에서는 centered `g`에 대해 `P^ng=(-1)^ng`가 될 수
+있다. 그래서 pointwise covariance는 `(-1)^n/2`처럼 진동하며 0으로 가지
+않는다. 하지만 `c₁-cₙ₊₂`는 여전히 bounded이고 `n+1`로 나누면 0으로 간다.
+Lean의 periodic regression example은 이 두 사실을 모두 증명한다.
 
 ### Lean 지도
 
-현재 **이미 있는 조각**은 다음과 같다.
-
 | 역할 | Lean 이름 | 파일 |
 |---|---|---|
-| Markov iterate `Pⁿ` | `markovIterate` | `LeanMetro/VarianceLimit.lean` |
-| 요구되는 decay 형태 | `stationaryScaledVariance_tendsto_algebraicAsymptoticVariance`의 `hdecay` | `LeanMetro/VarianceLimit.lean` |
-| 실제 variance limit에서 같은 가정 사용 | `chainSampleMean_scaledVariance_tendsto` | `LeanMetro/SampleMeanVariance.lean` |
-| 최종 비교에서 양쪽 decay 가정 | `metropolisHastings_minimizes_sampleMeanAsymptoticVariance` | `LeanMetro/ProbabilisticPeskun.lean` |
-| 구체적 geometric iterate | `two_state_mh_iterate_solution`, `two_state_competitor_iterate_solution` | `LeanMetro/CrownExample.lean` |
-| 구체적 decay discharge | `two_state_crown_mh_poisson_covariance_tendsto_zero`, `two_state_crown_competitor_poisson_covariance_tendsto_zero` | `LeanMetro/CrownExample.lean` |
-
-현재 **아직 없는 일반 adapter**는 다음 사슬이다.
-
-```text
-finite + π>0 + reversible + irreducible + aperiodic
-  → P is self-adjoint on weighted L²(π)
-  → 1-eigenspace is constants
-  → every centered eigenvalue has absolute value < 1
-  → geometric norm bound for Pⁿ on H₀
-  → ⟨f, Pⁿg⟩π → 0
-```
+| 한 lag의 discrete difference | `weightedInner_markovIterate_eq_quadratic_sub_succ` | `LeanMetro/ReversibleVarianceLimit.lean` |
+| 전체 합의 endpoint identity | `sum_weightedInner_markovIterate_eq_endpoints` | `LeanMetro/ReversibleVarianceLimit.lean` |
+| Markov iterate uniform bound | `abs_markovIterate_le_sum_abs` | `LeanMetro/ReversibleVarianceLimit.lean` |
+| quadratic sequence uniform bound | `abs_weightedInner_markovIterate_le` | `LeanMetro/ReversibleVarianceLimit.lean` |
+| decay-free covariance-formula limit | `stationaryScaledVariance_tendsto_algebraicAsymptoticVariance_of_reversible` | `LeanMetro/ReversibleVarianceLimit.lean` |
+| actual finite-path variance limit | `chainSampleMean_scaledVariance_tendsto_of_reversible` | `LeanMetro/ReversibleSampleMeanVariance.lean` |
+| generic irreducible constructor | `hasSampleMeanAsymptoticVariance_of_irreducible` | `LeanMetro/IrreduciblePeskun.lean` |
+| 최종 MH comparison | `metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible` | `LeanMetro/IrreduciblePeskun.lean` |
+| periodic decay 반례와 variance limit | `periodic_poisson_covariance_not_tendsto_zero`, `periodic_sampleMean_scaledVariance_tendsto_zero` | `LeanMetro/PeriodicVarianceExample.lean` |
 
 ### 현재 증명 경계
 
-- 일반적인 `aperiodic → covariance decay` theorem은 아직 증명하지 않았다.
-- 구체 예제의 decay는 행렬에 대한 일반 spectral theorem을 호출한 것이 아니라,
-  `Pⁿg=c λⁿg`를 직접 귀납하고 실수 geometric sequence의 극한을 사용한다.
-- Markov-chain CLT, mixing-time bound, convergence rate의 일반 이론은 없다.
-- decay는 실제 최종 theorem에서 숨겨진 가정이 아니라 `hdecayMH`, `hdecayA`로
-  드러난 parameter다.
+- sample-mean scaled-variance limit과 Peskun ordering에는 pointwise decay,
+  aperiodicity, spectral gap이 더 이상 필요하지 않다.
+- 기존 decay 기반 정리는 호환성과 구체적 spectral behavior 설명을 위해
+  유지한다.
+- `P^ng→0`, quantitative mixing rate, convergence from arbitrary starts를
+  얻으려면 여전히 spectral 또는 coupling argument가 필요하다.
+- Markov-chain CLT와 분포수렴은 증명하지 않았다.
 
 ### 자기점검 질문
 
-1. reversibility는 `P`의 어떤 operator 성질로 번역되는가?
-2. irreducibility와 aperiodicity는 각각 spectrum의 어떤 문제를 없애는가?
-3. deterministic two-cycle이 decay의 반례가 되는 이유는 무엇인가?
-4. ordinary spectral gap과 absolute spectral gap의 차이는 무엇인가?
-5. `Pⁿg→0`에서 `⟨f,Pⁿg⟩→0`으로 가는 부등식은 무엇인가?
-6. 현재 예제의 geometric proof와 아직 없는 일반 spectral adapter의 차이를
-   설명할 수 있는가?
+1. Poisson equation만으로는 왜 망원합이 안 되고 reversibility가 필요한가?
+2. remainder의 마지막 endpoint가 `c_{n+1}`이 아니라 `c_{n+2}`인 이유는?
+3. Markov operator가 uniform absolute bound를 보존하는 계산은 무엇인가?
+4. deterministic two-cycle에서 pointwise decay는 실패하지만 평균 remainder는
+   사라지는 이유는 무엇인가?
+5. sample-mean variance limit과 `P^ng→0`은 어떤 점에서 다른 주장인가?
+6. spectral adapter가 여전히 유용한 목표는 무엇인가?
 
 ---
 
@@ -818,7 +796,7 @@ $$
 2. stationarity는 path measure를 만드는 데 필요한가, moment를 lag만의 함수로
    만드는 데 필요한가?
 3. `chainSampleMean_scaledVariance_eq`의 왼쪽과 오른쪽은 각각 무엇인가?
-4. covariance decay에서 variance limit으로 갈 때 Cesàro 정리가 왜 등장하는가?
+4. exact variance remainder가 왜 `c₁-cₙ₊₂`로 망원합되는가?
 5. 서로 다른 확률공간 위 variance들의 극한과 almost-sure convergence의 차이는
    무엇인가?
 6. 이 프로젝트가 Markov-chain CLT를 증명했다고 말하면 왜 과장인가?
@@ -837,10 +815,10 @@ $$
    각각 말한다.
 4. finite irreducibility가 centered `I-P`의 injectivity와 surjectivity를 통해
    Poisson inverse를 공급한다고 설명한다.
-5. actual variance 해석은 horizon별 path measure와 exact finite-n identity가
-   담당한다고 말한다.
-6. 마지막으로 일반 covariance decay adapter는 아직 없고, 현재는 명시적
-   `hdecay` 또는 구체 예제의 geometric proof로 닫는다고 경계를 긋는다.
+5. reversibility가 Poisson remainder를 망원합하고 bounded endpoint를 표본 수로
+   나누면 0이 된다고 설명한다.
+6. actual variance 해석은 horizon별 path measure와 exact finite-n identity가
+   담당하며, spectral theory는 mixing/rate용 후속 범위라고 경계를 긋는다.
 
 ## 최종 구두시험 체크리스트
 
@@ -854,13 +832,15 @@ $$
 - “irreducibility가 fixed points를 constants로 만드는 maximum-principle 계산은
   …”
 - “finite-dimensionality는 `I-P`가 … 이면 … 임을 보장하는 딱 한 곳에 쓰인다.”
-- “aperiodicity가 없으면 eigenvalue … 때문에 decay가 실패할 수 있다.”
+- “aperiodicity가 없으면 eigenvalue … 때문에 pointwise decay는 실패할 수
+  있지만 variance remainder는 … 때문에 사라진다.”
 - “horizon별 sample space만 있어도 variance limit을 말할 수 있는 이유는 각
   variance가 결국 … 이기 때문이다.”
-- “현재 최종 theorem이 아직 외부에서 받는 핵심 조건은 … 이며, 일반 adapter로
-  아직 증명되지 않은 것은 … 이다.”
+- “현재 최종 theorem이 외부에서 받는 표준 ergodic 조건은 … 이며, 더 이상
+  받지 않는 조건은 … 이다.”
 
-마지막 문장의 정답은 다음과 같다. Poisson invertibility는 이제 finite
-irreducibility adapter로 만들 수 있다. 일반적인 covariance decay는 여전히
-explicit `Tendsto` 가정이며, irreducible·aperiodic reversible finite kernel에서
-이를 자동 도출하는 spectral adapter는 아직 남아 있다.
+마지막 문장의 정답은 다음과 같다. 최종 wrapper는 MH와 competitor kernel의
+finite irreducibility를 각각 받는다. normalized stationarity와 함께 이것으로
+Poisson inverse를 만들고, reversibility의 bounded telescoping으로 실제 variance
+limit을 얻는다. `hdecay`와 aperiodicity는 더 이상 받지 않는다. 일반 spectral
+adapter는 pointwise decay, mixing, quantitative rate를 위한 후속 과제다.

@@ -7,14 +7,14 @@
 유한 상태 Metropolis–Hastings correctness와 실제 stationary 표본평균의
 Peskun asymptotic-variance ordering을 Lean 4로 형식 검증한다.
 
-주정리 `metropolisHastings_minimizes_sampleMeanAsymptoticVariance`는 동일한
-target·proposal을 쓰는 MH와 admissible competitor의 실제 scaled-variance
-극한을 구성하고 MH의 극한값이 더 크지 않음을 증명한다. 유한 비공집합,
-양의 target, stochastic proposal, centered observable, 양쪽 centered Poisson
-invertibility와 covariance decay를 명시적으로 받는다. 다만 normalized
-stationarity와 finite irreducibility에서는 Poisson invertibility를 프로젝트
-내부 adapter로 자동 생성한다. 무한 path space, CLT, 일반 aperiodicity에서 covariance decay의
-자동 도출은 아직 주장하지 않는다.
+주정리
+`metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible`은
+동일한 양의 target·stochastic proposal을 쓰는 MH와 admissible competitor가
+각각 finite irreducible이면 실제 scaled-variance 극한이 존재하고 MH의
+극한값이 더 크지 않음을 증명한다. Poisson inverse는 최대원리와 유한차원
+선형대수로 만들고, reversibility가 exact remainder를 망원합으로 바꾸므로
+covariance decay나 aperiodicity를 가정하지 않는다. 무한 path space, CLT,
+mixing rate는 주장하지 않는다.
 [정리 감사](THEOREM_AUDIT.md) · [증명 소유권 가이드](docs/PROOF_OWNERSHIP_GUIDE.md) · [변경 기록](CHANGELOG.md) · [MIT 라이선스](LICENSE)
 
 ## 최종 결과
@@ -49,9 +49,13 @@ stationarity와 finite irreducibility에서는 Poisson invertibility를 프로�
   ```
 
   를 만족함을 증명한다.
-- Poisson remainder covariance가 0으로 수렴하면 이 실제 scaled variance가
-  algebraic asymptotic variance로 수렴하며, 같은 가정 아래 MH의 극한값이
-  임의 admissible accept/reject kernel보다 작거나 같다.
+- reversible kernel에서는 Poisson remainder의 Cesàro 합이 두 endpoint의
+  차이로 망원합되고, finite stochastic iterate가 균일하게 bounded이므로
+  별도 covariance-decay 가정 없이 실제 scaled variance가 algebraic
+  asymptotic variance로 수렴한다.
+- normalized stationary finite irreducible MH와 irreducible admissible
+  competitor에 대해 Poisson inverse와 두 실제 극한을 내부에서 만들고, MH의
+  극한값이 더 크지 않음을 증명한다.
 
 대각항은 다른 상태로 실제 이동하고 남은 확률로 정의한다.
 
@@ -132,22 +136,34 @@ maximality부터 variance ordering까지를 한 정리로 합성한다.
 
 `LeanMetro/VarianceLimit.lean`은 stationary covariance 형태의 유한시간 식이
 Poisson remainder의 Cesàro 평균만큼 algebraic variance와 다르다는 정확한
-항등식과, remainder covariance가 0으로 수렴할 때의 극한 정리를 증명한다.
-`LeanMetro/FinitePath.lean`부터 `LeanMetro/ProbabilisticPeskun.lean`까지는
-모든 horizon에 대해 실제 path PMF와 probability measure를 구성하고,
-mathlib의 `ProbabilityTheory.variance`로 계산한 표본평균 분산을 위 식과
-연결한다. 최종 정리는 다음이다.
+항등식을 증명한다. `LeanMetro/ReversibleVarianceLimit.lean`은
 
 ```text
-metropolisHastings_minimizes_sampleMeanAsymptoticVariance
+∑ k=0..n, <f, P^(k+1)g>_π
+  = <g, Pg>_π - <g, P^(n+2)g>_π
+```
+
+를 증명하고 finite Markov iterate의 uniform bound로 remainder를 0에 보낸다.
+따라서 pointwise covariance decay, aperiodicity, spectral theorem 없이도
+variance limit이 성립한다. `LeanMetro/FinitePath.lean`부터
+`LeanMetro/ReversibleSampleMeanVariance.lean`까지는 실제 path PMF와
+mathlib의 `ProbabilityTheory.variance`를 이 극한에 연결한다. 표준 가정형
+최종 정리는 다음이다.
+
+```text
+metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible
 ```
 
 3상태 회귀 예제에서는 fast kernel과 lazy kernel의 실제 표본평균
 점근분산이 각각 `2/3`, `2`이고 전자가 엄격히 작음을 검증한다. 필요한
-Poisson covariance decay도 fast와 lazy 양쪽에서 Lean으로 증명한다.
+기존 decay 기반 정리와 구체적 geometric decay 증명도 더 강한 spectral
+성질을 설명하는 호환 API로 유지한다.
 `LeanMetro/CrownExample.lean`은 동일한 2상태 target·proposal에서 MH와
-half-acceptance competitor를 만들고 최종 probabilistic theorem을 직접
-호출해 실제 극한 `3/2 ≤ 6`을 얻는 end-to-end integration test다.
+half-acceptance competitor를 만들고 새 irreducibility-facing theorem을 직접
+호출해 실제 극한 `3/2 ≤ 6`을 얻는다. 이 호출에는 `hinv`와 `hdecay` 인자가
+없다. `LeanMetro/PeriodicVarianceExample.lean`은 deterministic two-cycle의
+Poisson covariance가 `(-1)^n/2`라서 0으로 수렴하지 않지만 실제 scaled
+variance는 0으로 수렴함을 검증한다.
 [정리 가정 감사](THEOREM_AUDIT.md)는 정리의 가정과 남은 경계를 분리한다.
 
 ## 수치 예제
@@ -210,13 +226,17 @@ LeanMetro/
 ├── PeskunExample.lean
 ├── ThreeStateExample.lean
 ├── VarianceLimit.lean
+├── ReversibleVarianceLimit.lean
 ├── VarianceLimitExample.lean
 ├── FinitePath.lean
 ├── StationaryMoments.lean
 ├── SampleMeanVariance.lean
+├── ReversibleSampleMeanVariance.lean
 ├── ProbabilisticPeskun.lean
+├── IrreduciblePeskun.lean
 ├── SampleMeanVarianceExample.lean
 ├── CrownExample.lean
+├── PeriodicVarianceExample.lean
 ├── AxiomAudit.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
@@ -229,11 +249,13 @@ AcceptanceRule → MarkovKernel → WeightedSpace → DirichletForm
                                              ↓
 MeanZero → Poisson → AsymptoticVariance → Peskun
                                          ↓
-                                  VarianceLimit
+                    VarianceLimit → ReversibleVarianceLimit
                                          ↓
 FinitePath → StationaryMoments → SampleMeanVariance
                                          ↓
-                               ProbabilisticPeskun
+                          ReversibleSampleMeanVariance
+                                         ↓
+                     ProbabilisticPeskun → IrreduciblePeskun
 ```
 
 ## 빌드
@@ -254,19 +276,24 @@ lake env lean LeanMetro/Asymmetric.lean
 lake env lean LeanMetro/AsymmetricExample.lean
 lake env lean LeanMetro/Peskun.lean
 lake env lean LeanMetro/VarianceLimit.lean
+lake env lean LeanMetro/ReversibleVarianceLimit.lean
 lake env lean LeanMetro/SampleMeanVariance.lean
+lake env lean LeanMetro/ReversibleSampleMeanVariance.lean
 lake env lean LeanMetro/ProbabilisticPeskun.lean
+lake env lean LeanMetro/IrreduciblePeskun.lean
+lake env lean LeanMetro/CrownExample.lean
+lake env lean LeanMetro/PeriodicVarianceExample.lean
+lake env lean LeanMetro/AxiomAudit.lean
 ```
 
 ## 의도적인 범위 제한
 
 이 프로젝트는 finite-state MH correctness와, normalized stationarity 및
-finite irreducibility에서 자동 생성한 Poisson invertibility, 그리고 명시적 covariance-decay 가정 아래
-실제 stationary 표본평균의 점근분산 Peskun ordering을 증명한다. 다음은
-포함하지 않는다.
+finite irreducibility에서 자동 생성한 Poisson invertibility, reversible
+telescoping으로 얻은 실제 stationary 표본평균의 점근분산 Peskun ordering을
+증명한다. 다음은 포함하지 않는다.
 
-- 일반 aperiodicity·spectral gap에서 covariance decay를 자동 도출하는
-  adapter
+- `P^n g → 0`의 pointwise 또는 norm decay와 이를 주는 일반 spectral adapter
 - 임의 초기분포에서 stationary distribution으로의 convergence
 - convergence rate 또는 mixing time
 - 일반 측도공간의 `ProbabilityTheory.Kernel`

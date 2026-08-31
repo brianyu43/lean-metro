@@ -31,16 +31,17 @@ scalar acceptance identity
 - [x] Phase 6a — covariance/Cesàro variance-limit bridge
 - [x] Phase 6b — finite-path 확률공간과 실제 sample-mean variance identity
 - [x] Phase 7a — normalized stationary finite irreducibility에서 centered Poisson inverse 자동 생성
-- [ ] Phase 7b — aperiodicity/spectral 가정에서 covariance decay 자동 생성
+- [x] Phase 7b — reversible Poisson telescope로 covariance-decay 가정 제거
+- [ ] Phase 7c — pointwise decay, mixing, rate를 위한 spectral adapter
 
 ## 2. 최종 목표
 
 유한 상태공간 `S`, 양의 target weight `w`, stochastic proposal `q`,
-admissible acceptance `a`, 평균 0 함수 `f`에 대해 다음 최종 정리를
-완료했다.
+admissible acceptance `a`, 생성된 MH/competitor kernel 각각의
+irreducibility, 평균 0 함수 `f`에 대해 다음 최종 정리를 완료했다.
 
 ```text
-metropolisHastings_minimizes_sampleMeanAsymptoticVariance:
+metropolisHastings_minimizes_sampleMeanAsymptoticVariance_of_irreducible:
   HasSampleMeanAsymptoticVariance(MH, σMH)
   ∧ HasSampleMeanAsymptoticVariance(competitor, σA)
   ∧ σMH ≤ σA
@@ -49,7 +50,10 @@ metropolisHastings_minimizes_sampleMeanAsymptoticVariance:
 v1.0의 완료선은 finite-state Poisson-equation 표현으로 증명한 algebraic
 Peskun ordering이었다. Phase 6b에서는 각 유한 horizon의 실제 Markov path
 probability measure를 구성하고, 확률변수의 장시간 scaled variance 극한과
-이 algebraic 표현을 연결했다.
+이 algebraic 표현을 연결했다. Phase 7은 normalized target 아래 두 생성
+kernel의 finite irreducibility만으로 Poisson inverse를 만들고, reversibility의
+bounded telescoping argument로 pointwise covariance-decay 가정 없이 실제
+극한을 닫았다.
 
 ## 3. 수학적 범위와 설계 원칙
 
@@ -233,7 +237,7 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 - [x] 실제 random-variable sample mean의 variance를 covariance 공식과 연결
 - [x] 실제 scaled variance의 조건부 극한 정리
 - [x] MH와 admissible competitor의 실제 극한 및 ordering을 한 정리로 합성
-- [ ] irreducibility/aperiodicity 또는 spectral 가정에서 decay 자동 도출
+- [x] reversibility와 bounded Poisson telescope로 decay 가정 없는 극한 도출
 
 구현한 산출물:
 
@@ -252,17 +256,21 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 - `metropolisHastings_minimizes_sampleMeanAsymptoticVariance`
 - `LeanMetro/SampleMeanVarianceExample.lean`
 - fast/lazy 3상태 실제 점근분산 극한 `2/3`, `2`
+- `LeanMetro/ReversibleVarianceLimit.lean`
+- `stationaryScaledVariance_tendsto_algebraicAsymptoticVariance_of_reversible`
+- `LeanMetro/ReversibleSampleMeanVariance.lean`
+- `chainSampleMean_scaledVariance_tendsto_of_reversible`
 
 진행 조건:
 
-- 6a의 극한 정리는 Poisson remainder covariance가 0으로 수렴한다는 가정을
-  정리문에 노출한다.
+- 기존 6a 극한 정리는 Poisson remainder covariance가 0으로 수렴한다는 가정을
+  받는 호환 API로 유지한다. 새 reversible 정리는 그 가정을 받지 않는다.
 - 표본 수는 `N=n+1`이며 Lean은
   `N * Var(chainSampleMean n) = stationaryScaledVariance n`을 증명한다.
 - 하나의 무한 경로공간과 일반 Markov-chain CLT는 독립 후속 milestone로
   유지한다.
 
-### Phase 7 — 표준 ergodic 가정 adapter
+### Phase 7 — 표준 irreducibility와 decay-free variance adapter
 
 완료한 7a:
 
@@ -274,14 +282,27 @@ theorem dirichletForm_mono_of_peskunDominates ... :
 - [x] `meanZeroPoissonInvertible_of_irreducible` 완성
 - [x] 2상태 MH와 lazy competitor에서 새 adapter를 실제 사용
 
-남은 7b:
+완료한 7b:
 
-- [ ] irreducible·aperiodic reversible kernel의 mean-zero spectral decay
-- [ ] 위 결과에서 crown theorem의 covariance-decay 인자 자동 생성
+- [x] Poisson 식과 self-adjointness에서 lag covariance를 이웃한 두
+  quadratic form의 차로 표현
+- [x] finite sum을 정확한 endpoint difference로 telescoping
+- [x] stochastic Markov iterate와 endpoint quadratic form의 uniform bound
+- [x] covariance-decay 가정 없는 actual sample-mean variance limit
+- [x] 두 generated kernel의 irreducibility만 받는 public Peskun wrapper
+- [x] period-2 reversible chain에서 pointwise decay 실패와 variance limit
+  성공을 동시에 검증
 
-7a는 crown theorem의 Poisson-invertibility 가정을 normalized stationarity와
-표준 irreducibility로 닫는다. 7b가 완료되기 전에는 일반적인 decay를 자동
-도출한다고 주장하지 않는다.
+남은 7c:
+
+- [ ] irreducible·aperiodic reversible kernel의 mean-zero pointwise 또는
+  norm decay
+- [ ] spectral gap에서 quantitative mixing rate 도출
+
+7a는 Poisson-invertibility 가정을 normalized stationarity와 표준
+irreducibility로 닫는다. 7b는 실제 표본평균 분산 극한에 더 강한 pointwise
+decay가 필요하지 않음을 증명한다. 7c의 spectral adapter는 `P^n g → 0`,
+mixing, rate를 위한 독립 후속 범위이지 crown theorem의 미완성 가정이 아니다.
 
 ## 5. 파일 구조
 
@@ -306,13 +327,17 @@ LeanMetro/
 ├── PeskunExample.lean
 ├── ThreeStateExample.lean
 ├── VarianceLimit.lean
+├── ReversibleVarianceLimit.lean
 ├── VarianceLimitExample.lean
 ├── FinitePath.lean
 ├── StationaryMoments.lean
 ├── SampleMeanVariance.lean
+├── ReversibleSampleMeanVariance.lean
 ├── ProbabilisticPeskun.lean
+├── IrreduciblePeskun.lean
 ├── SampleMeanVarianceExample.lean
 ├── CrownExample.lean
+├── PeriodicVarianceExample.lean
 ├── AxiomAudit.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
@@ -331,6 +356,7 @@ LeanMetro/
 | 11월–12월 초 | 최종 Peskun 합성, 예제, 문서 | v1.0 후보 |
 | 8월 31일 | finite-path variance-limit 직접 연결 | v1.1 |
 | 8월 31일 | irreducibility adapter, crown integration, audit·포장 | v1.2 |
+| 8월 31일 | reversible telescope, decay-free crown, periodic regression | v1.3 |
 
 ## 7. 검증과 릴리스 게이트
 
@@ -367,7 +393,8 @@ git ls-remote origin refs/heads/main
 4. Mean-zero 공간과 Poisson equation
 5. Inverse inequality와 asymptotic variance
 6. 확률적 variance-limit 연결
-7. 표준 irreducibility·spectral adapter
+7. 표준 irreducibility와 reversible telescoping adapter
+8. 필요할 때만 pointwise decay·mixing·rate용 spectral adapter
 
 알림에는 새 정의, 필요한 가정, 이전 단계에서 재사용하는 정리, 이번 단계의
 컴파일 완료 기준을 짧게 포함한다.

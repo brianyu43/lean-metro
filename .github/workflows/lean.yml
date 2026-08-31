@@ -34,6 +34,6 @@ jobs:
             exit 1
           fi
 
-      - name: Audit crown theorem dependencies
+      - name: Audit public and end-to-end theorem dependencies
         shell: bash
         run: lake env lean LeanMetro/AxiomAudit.lean
