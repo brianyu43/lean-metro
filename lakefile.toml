@@ -1,6 +1,6 @@
 name = "lean_metro"
-version = "1.3.0"
-defaultTargets = ["LeanMetro"]
+version = "2.0.0"
+defaultTargets = ["LeanMetro", "LeanMetroGeneral"]
 
 [[require]]
 name = "mathlib"
@@ -9,3 +9,6 @@ rev = "0df444a360eaa60ab8c11dca51a86af692955474"
 
 [[lean_lib]]
 name = "LeanMetro"
+
+[[lean_lib]]
+name = "LeanMetroGeneral"

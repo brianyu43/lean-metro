@@ -106,6 +106,43 @@ finite stationary path PMF/Measure
 `sorryAx`나 프로젝트 고유 공리가 추가되어 출력이 바뀌면 audit 모듈과 CI가
 실패한다.
 
+## 개발 중인 general-state crown theorem
+
+```text
+LeanMetroGeneral.referenceMH_largest_reversibleAcceptedFlow
+```
+
+이 정리는 아직 transition kernel이나 variance를 말하지 않는다. 임의의
+measurable state space `X`, reference measure `μ`, proposal kernel `Q`, target
+density `h : X → ℝ≥0∞`, acceptance `a : X → X → ℝ≥0∞`에서 다음을 입력으로
+받는다.
+
+- joint reference proposal flow `μ(dx)Q(x,dy)`가 swap-symmetric이다.
+- `h`와 uncurried `a`가 measurable이다.
+- 모든 `x,y`에서 `a(x,y) ≤ 1`이다. 비음수성은 codomain `ℝ≥0∞`에 내장된다.
+- joint reference flow 거의 모든 `(x,y)`에서
+  `h(x)a(x,y)=h(y)a(y,x)`이다.
+
+그리고 다음을 증명한다.
+
+```text
+acceptedFlow μ Q h a is swap-symmetric
+referenceMHAcceptedFlow μ Q h is swap-symmetric
+acceptedFlow μ Q h a ≤ referenceMHAcceptedFlow μ Q h
+```
+
+마지막 부등식의 density는 정확히
+
+```text
+h(x)a(x,y) ≤ min(h(x),h(y))
+```
+
+이다. `LeanMetroGeneral/AxiomAudit.lean`은 이 정리가
+`[propext, Classical.choice, Quot.sound]` 이외의 공리에 의존하지 않음을
+고정한다. `FiniteAdapter.lean`의 첫 회귀 정리는 proposal이 대칭이고 모든
+entry가 양수인 finite 특수화만 복원한다. zero proposal entry와 비대칭
+proposal 전체를 복원하는 measure-common-part adapter는 아직 없다.
+
 ## 수치·경계 회귀 예제
 
 - 2상태 MH/lazy: actual scaled-variance limits `3/2`, `6`, 그리고 `3/2 ≤ 6`
@@ -128,9 +165,13 @@ aperiodicity가 sample-mean variance limit의 필요조건이 아님을 실제�
   extension
 - Markov-chain central limit theorem 또는 분포수렴
 - 임의 초기분포에서 stationary distribution으로의 convergence
-- 일반 측도 상태공간의 MH
+- 일반 상태공간의 완성된 accept/reject MH transition kernel
+- 일반 상태공간의 Dirichlet, Poisson, actual variance Peskun theorem
+- Gaussian reference measure 위 무한차원 pCN crown theorem
 - 부동소수점 sampler 구현의 수치적 정확성
 
-따라서 현재 결과는 finite irreducible reversible MH와 irreducible admissible
-competitor의 실제 stationary sample-mean asymptotic-variance Peskun ordering을
-증명한다. 이는 CLT, 무한 경로공간, mixing-rate 정리가 아니다.
+따라서 완결된 variance 결과는 여전히 finite irreducible reversible MH와
+irreducible admissible competitor의 실제 stationary sample-mean
+asymptotic-variance Peskun ordering이다. general-state namespace의 현재 결과는
+measure-level accepted-flow maximality까지이며, CLT, 무한 경로 variance,
+mixing-rate 또는 pCN 정리가 아니다.

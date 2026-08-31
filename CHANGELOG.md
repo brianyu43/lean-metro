@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## [v2.0.0] — 2026-08-31
+
+- Added a separate `LeanMetroGeneral` theory layer for measurable-state-space
+  joint proposal flows, swap-based reversibility, and stationarity.
+- Proved change of variables for reversing a measure with density and the
+  reference-reversible target-flow formula.
+- Proved `referenceMH_largest_reversibleAcceptedFlow`: admissible competitor
+  and MH accepted flows are symmetric, and the MH flow dominates the
+  competitor as a measure.
+- Added a finite discrete adapter that recovers the symmetric-positive
+  specialization of the existing accepted-move maximality theorem.
+- Added a pinned axiom audit and a staged roadmap from reference-state MH to
+  full Tierney ordering and infinite-dimensional pCN.
+
+Detailed notes: [docs/releases/RELEASE_NOTES_V2.0.md](docs/releases/RELEASE_NOTES_V2.0.md)
+
 ## [v1.3.0] — 2026-08-31
 
 - Removed the pointwise Poisson-covariance-decay assumption from the actual
@@ -61,6 +77,7 @@ Detailed notes: [docs/releases/RELEASE_NOTES.md](docs/releases/RELEASE_NOTES.md)
   balance, and stationarity.
 
 [v1.3.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.3.0
+[v2.0.0]: https://github.com/brianyu43/lean-metro/releases/tag/v2.0.0
 [v1.2.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.2.0
 [v1.1.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.1.0
 [v1.0.0]: https://github.com/brianyu43/lean-metro/releases/tag/v1.0.0

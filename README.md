@@ -166,6 +166,39 @@ Poisson covariance가 `(-1)^n/2`라서 0으로 수렴하지 않지만 실제 sca
 variance는 0으로 수렴함을 검증한다.
 [정리 가정 감사](THEOREM_AUDIT.md)는 정리의 가정과 남은 경계를 분리한다.
 
+## Part III: 일반 상태공간 확장 (개발 중)
+
+기존 finite 이론을 그대로 보존하면서 `LeanMetroGeneral` namespace에서
+measure-theoretic 이론층을 별도로 만들고 있다. 현재 컴파일되는 첫 결과는
+다음 사슬이다.
+
+```text
+proposalFlow π Q = π(dx)Q(x,dy)
+swap symmetry = measure-level reversibility
+measure-level reversibility => stationarity
+reference-reversible target flow density: h(x) / h(y)
+balanced competitor accepted density <= min(h(x), h(y))
+```
+
+`referenceMH_largest_reversibleAcceptedFlow`은 reference proposal flow가
+swap-symmetric이고 `h`와 acceptance가 measurable이며 acceptance가 1 이하이고
+accepted density가 양방향으로 balance된다는 조건 아래 다음 세 결론을 함께
+증명한다.
+
+- competitor accepted flow가 swap-symmetric이다.
+- MH accepted flow가 swap-symmetric이다.
+- competitor accepted flow가 MH accepted flow 이하이다.
+
+즉 finite의 `Aa ≤ A`, `Aa = Baᵀ ≤ B`, 따라서 `Aa ≤ min(A,B)` 논증을 joint
+measure의 a.e. density와 `Measure.withDensity_mono`로 옮겼다.
+`FiniteAdapter.lean`은 counting measure 위에서 이 결과가 대칭·양의 finite
+proposal에 대한 기존 accepted-move maximality를 복원함을 검증한다.
+
+아직 general accept/reject Markov kernel, Dirichlet/L²/Poisson ordering,
+Ionescu--Tulcea trajectory variance, spectral-gap adapter, Gaussian pCN은
+증명하지 않았다. 단계별 완료선과 full Tierney 정리까지의 범위는
+[general-state 로드맵](docs/development/GENERAL_STATE_ROADMAP.md)에 고정했다.
+
 ## 수치 예제
 
 ### 대칭 proposal
@@ -240,6 +273,14 @@ LeanMetro/
 ├── AxiomAudit.lean
 ├── TwoState.lean
 └── AsymmetricExample.lean
+
+LeanMetroGeneral/
+├── JointFlow.lean
+├── Reversibility.lean
+├── ReferenceProposal.lean
+├── AcceptedFlow.lean
+├── FiniteAdapter.lean
+└── AxiomAudit.lean
 ```
 
 핵심 의존성은 다음 순서다.
@@ -284,6 +325,9 @@ lake env lean LeanMetro/IrreduciblePeskun.lean
 lake env lean LeanMetro/CrownExample.lean
 lake env lean LeanMetro/PeriodicVarianceExample.lean
 lake env lean LeanMetro/AxiomAudit.lean
+lake env lean LeanMetroGeneral/AcceptedFlow.lean
+lake env lean LeanMetroGeneral/FiniteAdapter.lean
+lake env lean LeanMetroGeneral/AxiomAudit.lean
 ```
 
 ## 의도적인 범위 제한
@@ -296,7 +340,8 @@ telescoping으로 얻은 실제 stationary 표본평균의 점근분산 Peskun o
 - `P^n g → 0`의 pointwise 또는 norm decay와 이를 주는 일반 spectral adapter
 - 임의 초기분포에서 stationary distribution으로의 convergence
 - convergence rate 또는 mixing time
-- 일반 측도공간의 `ProbabilityTheory.Kernel`
+- 일반 상태공간의 완성된 accept/reject Markov kernel과 Peskun variance theorem
+- Gaussian measure 위 무한차원 pCN 적용
 - 부동소수점 sampler 구현의 정확성
 - 하나의 무한 경로공간 위에서 모든 시간 좌표를 동시에 구성하는
   Kolmogorov extension 또는 Markov-chain CLT

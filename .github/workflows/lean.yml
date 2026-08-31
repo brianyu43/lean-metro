@@ -29,11 +29,13 @@ jobs:
         run: |
           if grep -R -n -E \
             '(^|[^[:alnum:]_])(sorry|admit|axiom)([^[:alnum:]_]|$)' \
-            --include='*.lean' LeanMetro LeanMetro.lean; then
+            --include='*.lean' LeanMetro LeanMetroGeneral LeanMetro.lean LeanMetroGeneral.lean; then
             echo 'Lean sources contain sorry, admit, or a user-declared axiom.'
             exit 1
           fi
 
       - name: Audit public and end-to-end theorem dependencies
         shell: bash
-        run: lake env lean LeanMetro/AxiomAudit.lean
+        run: |
+          lake env lean LeanMetro/AxiomAudit.lean
+          lake env lean LeanMetroGeneral/AxiomAudit.lean

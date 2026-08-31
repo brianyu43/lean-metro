@@ -93,11 +93,37 @@ subspace, and applies injective-implies-surjective to `I-P`. Its theorem
 Poisson inverse. `IrreduciblePeskun.lean` composes that adapter with the
 decay-free variance theorem into the public crown theorem.
 
+## General-state extension (unreleased)
+
+The finite development remains unchanged. A separate `LeanMetroGeneral`
+namespace now contains the first measure-theoretic layer:
+
+```text
+joint proposal flow pi(dx) Q(x,dy)
+  => swap-based reversibility
+  => stationarity
+  => reference-target densities h(x) and h(y)
+  => MH accepted-flow maximality with density min(h(x),h(y)).
+```
+
+`referenceMH_largest_reversibleAcceptedFlow` proves that an admissible
+competitor flow and the MH accepted flow are both swap-symmetric and that the
+competitor is dominated by MH as a measure. Its proof is the finite
+`Aa <= A`, `Aa = Ba^T <= B` argument lifted to almost-everywhere densities and
+`Measure.withDensity_mono`. `FiniteAdapter.lean` recovers the existing
+accepted-move inequality for positive symmetric finite proposals.
+
+This unreleased layer does not yet construct the general accept/reject kernel,
+Dirichlet or L2 operators, trajectory variance, a spectral-gap adapter, or the
+infinite-dimensional Gaussian pCN application. Those gates are fixed in the
+[general-state roadmap](docs/development/GENERAL_STATE_ROADMAP.md).
+
 ## Claim boundary
 
 The project uses a separate probability space for each finite horizon; it
 does not construct one infinite path space through a Kolmogorov extension.
-It does not prove pointwise or norm convergence of `P^n g`, derive spectral
+The completed finite theorem does not prove pointwise or norm convergence of
+`P^n g`, derive spectral
 mixing rates, prove a Markov-chain CLT, or analyze convergence from arbitrary
 initial distributions. See [THEOREM_AUDIT.md](THEOREM_AUDIT.md) for all
 assumptions and exclusions.
@@ -112,4 +138,5 @@ lake exe cache get
 lake build
 ```
 
-CI also rejects `sorry`, `admit`, and user-defined `axiom` declarations.
+CI also rejects `sorry`, `admit`, and user-defined `axiom` declarations in both
+namespaces and audits the finite and general-state crown theorem dependencies.
